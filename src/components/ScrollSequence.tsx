@@ -16,12 +16,23 @@ export type ScrollSequenceProps = {
   /** Still image shown until the first frame is ready. */
   poster: string;
   alt: string;
+  /** Parallel frame downloads. */
+  concurrency: number;
+  /** Cap the canvas backing store at 2x the native frame size. Used for the small set. */
+  capToFrame: boolean;
   ref?: Ref<ScrollSequenceHandle>;
 };
 
 const LOGO_SRC = '/brand/logo-mark.jpg';
-const PRELOAD_CONCURRENCY = 6;
 const MAX_DPR = 2;
+/** Start loading when the stage is within 1.5 viewports of the screen. */
+const LOAD_MARGIN = '150% 0px 150% 0px';
+const CAP_FACTOR = 2;
+
+const TODO = 0;
+const LOADING = 1;
+const DONE = 2;
+const FAILED = 3;
 
 const pad = (n: number) => String(n).padStart(4, '0');
 const clamp01 = (n: number) => (n < 0 ? 0 : n > 1 ? 1 : n);
@@ -31,8 +42,18 @@ const clamp01 = (n: number) => (n < 0 ? 0 : n > 1 ? 1 : n);
  * Global progress picks the segment, and local progress picks the frame.
  * The frame is fitted with "contain", so the whole square is always visible.
  * The parent StorySection pins the section and calls `setProgress` through the ref.
+ *
+ * Loading: nothing loads until the stage nears the screen. Then the segment
+ * the visitor is in loads first, then the next one, then the rest in order.
  */
-export function ScrollSequence({ segments, poster, alt, ref }: ScrollSequenceProps) {
+export function ScrollSequence({
+  segments,
+  poster,
+  alt,
+  concurrency,
+  capToFrame,
+  ref,
+}: ScrollSequenceProps) {
   const stageRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const engineRef = useRef<ScrollSequenceHandle | null>(null);
@@ -93,13 +114,27 @@ export function ScrollSequence({ segments, poster, alt, ref }: ScrollSequencePro
     let progress = 0;
     let lastTarget = -1;
     let drawn = -1;
+    let active = false;
+    let focusSeg = 0;
+    let running = 0;
+    let nativeSize = 0;
+    let shown = false;
     const frames: (HTMLImageElement | null)[] = new Array(total).fill(null);
+    const status: Uint8Array = new Uint8Array(total); // all TODO
 
     const sizeCanvas = () => {
       const rect = stage.getBoundingClientRect();
       const dpr = Math.min(window.devicePixelRatio || 1, MAX_DPR);
-      canvas.width = Math.max(1, Math.round(rect.width * dpr));
-      canvas.height = Math.max(1, Math.round(rect.height * dpr));
+      let w = rect.width * dpr;
+      let h = rect.height * dpr;
+      if (capToFrame && nativeSize > 0) {
+        // No point upscaling a small frame into a much larger canvas.
+        const k = Math.min(1, (nativeSize * CAP_FACTOR) / Math.max(w, h));
+        w *= k;
+        h *= k;
+      }
+      canvas.width = Math.max(1, Math.round(w));
+      canvas.height = Math.max(1, Math.round(h));
       // Resizing the canvas resets its context state.
       drawn = -1;
     };
@@ -149,8 +184,76 @@ export function ScrollSequence({ segments, poster, alt, ref }: ScrollSequencePro
       });
     };
 
+    const loadFrame = (i: number) =>
+      new Promise<HTMLImageElement | null>((resolve) => {
+        const img = new Image();
+        img.decoding = 'async';
+        img.onload = () => resolve(img);
+        img.onerror = () => resolve(null);
+        img.src = urls[i];
+      });
+
+    // Next frame to fetch. Only the focus segment and the one after it are
+    // wanted. The focus segment goes first, nearest frame first.
+    // Other segments load only when the focus moves to them.
+    const pickNext = (): number => {
+      const target = frameIndexFor(progress);
+      for (const seg of [focusSeg, focusSeg + 1]) {
+        if (seg >= segmentCount) continue;
+        const start = offsets[seg];
+        const end = start + segments[seg].count;
+        let best = -1;
+        let bestDist = Infinity;
+        for (let i = start; i < end; i++) {
+          if (status[i] !== TODO) continue;
+          const dist = seg === focusSeg ? Math.abs(i - target) : i - start;
+          if (dist < bestDist) {
+            bestDist = dist;
+            best = i;
+          }
+        }
+        if (best !== -1) return best;
+      }
+      return -1;
+    };
+
+    const pump = () => {
+      if (cancelled || !active) return;
+      while (running < concurrency) {
+        const i = pickNext();
+        if (i < 0) return;
+        status[i] = LOADING;
+        running++;
+        void loadFrame(i).then((img) => {
+          running--;
+          if (cancelled) return;
+          if (img) {
+            status[i] = DONE;
+            frames[i] = img;
+            if (nativeSize === 0) {
+              nativeSize = img.naturalWidth;
+              sizeCanvas();
+            }
+            if (!shown) {
+              shown = true;
+              setFrameMode(true);
+            }
+            schedule();
+          } else {
+            status[i] = FAILED;
+          }
+          pump();
+        });
+      }
+    };
+
     const setProgress = (p: number) => {
       progress = clamp01(p);
+      const seg = segmentAt(progress, segmentCount);
+      if (seg !== focusSeg) {
+        focusSeg = seg;
+        pump();
+      }
       const target = frameIndexFor(progress);
       if (target === lastTarget) return;
       lastTarget = target;
@@ -166,52 +269,36 @@ export function ScrollSequence({ segments, poster, alt, ref }: ScrollSequencePro
     });
     ro.observe(stage);
 
-    const loadFrame = (i: number) =>
-      new Promise<HTMLImageElement | null>((resolve) => {
-        const img = new Image();
-        img.decoding = 'async';
-        img.onload = () => resolve(img);
-        img.onerror = () => resolve(null);
-        img.src = urls[i];
-      });
-
-    // Preload in story order: frame 1 first, then the rest in a small pool.
-    const run = async () => {
-      const first = await loadFrame(0);
-      if (cancelled) return;
-      if (!first) {
-        // First frame failed: keep the poster on screen.
-        return;
-      }
-      frames[0] = first;
-      setFrameMode(true);
-      lastTarget = -1;
-      setProgress(progress);
-
-      let next = 1;
-      const worker = async () => {
-        while (!cancelled && next < total) {
-          const i = next++;
-          const img = await loadFrame(i);
-          if (cancelled) return;
-          if (img) {
-            frames[i] = img;
-            schedule();
-          }
-        }
-      };
-      await Promise.all(Array.from({ length: PRELOAD_CONCURRENCY }, worker));
+    // Start loading only when the stage is near the screen.
+    let io: IntersectionObserver | null = null;
+    const start = () => {
+      active = true;
+      pump();
     };
-    void run();
+    if ('IntersectionObserver' in window) {
+      io = new IntersectionObserver(
+        (entries) => {
+          if (!entries.some((entry) => entry.isIntersecting)) return;
+          io?.disconnect();
+          io = null;
+          start();
+        },
+        { rootMargin: LOAD_MARGIN },
+      );
+      io.observe(stage);
+    } else {
+      start();
+    }
 
     return () => {
       cancelled = true;
+      io?.disconnect();
       ro.disconnect();
       if (rafId !== 0) cancelAnimationFrame(rafId);
       engineRef.current = null;
       setFrameMode(false);
     };
-  }, [segments]);
+  }, [segments, concurrency, capToFrame]);
 
   const showPoster = !frameMode;
 
@@ -225,7 +312,7 @@ export function ScrollSequence({ segments, poster, alt, ref }: ScrollSequencePro
         hidden={!frameMode}
       />
       {showPoster &&
-        (posterState === 'ok' ? (
+        (posterState !== 'failed' ? (
           // eslint-disable-next-line @next/next/no-img-element
           <img className={styles.poster} src={poster} alt={alt} />
         ) : (

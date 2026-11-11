@@ -11,11 +11,16 @@ export const metadata: Metadata = {
   icons: {
     icon: '/brand/logo-mark.jpg',
   },
+  appleWebApp: {
+    title: 'Bakersfield',
+    statusBarStyle: 'default',
+  },
 };
 
 export const viewport: Viewport = {
   width: 'device-width',
   initialScale: 1,
+  viewportFit: 'cover',
   themeColor: '#f6e7ca',
 };
 

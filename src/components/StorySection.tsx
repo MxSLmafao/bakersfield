@@ -6,20 +6,54 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { ScrollSequence, type ScrollSequenceHandle } from './ScrollSequence';
 import { sequenceBeats } from '@/content/beats';
 import { setBeatState, useBeatState } from '@/lib/beat-store';
+import { PHONE_QUERY, isCoarsePointer, isPhone, stableViewportHeight, wantsSmallFrames } from '@/lib/device';
 import { registerBeatY } from '@/lib/scroll';
 import { segmentAt } from '@/lib/segments';
 import styles from './StorySection.module.css';
 
 gsap.registerPlugin(ScrollTrigger);
+// Mobile browsers resize the viewport when the address bar shows or hides.
+// Do not refresh the pin for that. A real width change still refreshes it.
+ScrollTrigger.config({ ignoreMobileResize: true });
 
 /** Scroll length per beat, as a multiple of the viewport height. */
 const VH_PER_BEAT = 1.3;
+/** Shorter scroll per beat on phones, so the story is about five screens. */
+const VH_PER_BEAT_PHONE = 0.85;
 const SEGMENTS = sequenceBeats.length;
 const FRAME_SETS = sequenceBeats.map((beat) => beat.frames);
+const SMALL_FRAME_SETS = sequenceBeats.map((beat) => beat.framesSm);
 const STORY_POSTER = sequenceBeats[0].poster;
+const STORY_POSTER_SM = sequenceBeats[0].posterSm;
 const STORY_ALT = 'A croissant being made, from simple ingredients to a golden bake.';
 
 const pad2 = (n: number) => String(n).padStart(2, '0');
+
+/**
+ * Global progress where beat i starts. Aims 0.5% of a segment inside the
+ * segment, so rounding never lands on the previous beat.
+ */
+const beatProgress = (i: number) => (i + 0.005) / SEGMENTS;
+
+/** Pin length in px. Phones use the stable 100svh height, so the address bar does not move it. */
+function pinLength(): number {
+  const phone = isPhone();
+  const vh = isCoarsePointer() ? stableViewportHeight() : window.innerHeight;
+  return Math.round(vh * (phone ? VH_PER_BEAT_PHONE : VH_PER_BEAT) * SEGMENTS);
+}
+
+/**
+ * The poster. The browser picks the small file on phones, before any script runs,
+ * so the first paint is the same on the server and in the browser.
+ */
+function StoryPoster() {
+  return (
+    <picture className={styles.picture}>
+      <source media={PHONE_QUERY} srcSet={STORY_POSTER_SM} />
+      <img className={styles.poster} src={STORY_POSTER} alt={STORY_ALT} />
+    </picture>
+  );
+}
 
 /**
  * The six sequence beats as one pinned story. One canvas plays all six
@@ -29,6 +63,8 @@ const pad2 = (n: number) => String(n).padStart(2, '0');
 export function StorySection() {
   // 'pending' until the motion preference is known, so frames never load in reduced mode.
   const [mode, setMode] = useState<'pending' | 'pinned' | 'reduced'>('pending');
+  // Which frame set to use. Chosen once on mount and never switched, so no frames load twice.
+  const [frameSet, setFrameSet] = useState<'full' | 'small' | null>(null);
   const sectionRef = useRef<HTMLElement>(null);
   const seqRef = useRef<ScrollSequenceHandle>(null);
   const panelRefs = useRef<(HTMLDivElement | null)[]>([]);
@@ -40,6 +76,10 @@ export function StorySection() {
     update();
     mq.addEventListener('change', update);
     return () => mq.removeEventListener('change', update);
+  }, []);
+
+  useEffect(() => {
+    setFrameSet(wantsSmallFrames() ? 'small' : 'full');
   }, []);
 
   // Pinned story: one ScrollTrigger drives the frames, the panels and the store.
@@ -89,7 +129,7 @@ export function StorySection() {
       const st = ScrollTrigger.create({
         trigger: section,
         start: 'top top',
-        end: () => `+=${Math.round(window.innerHeight * VH_PER_BEAT * SEGMENTS)}`,
+        end: () => `+=${pinLength()}`,
         pin: true,
         pinSpacing: true,
         anticipatePin: 1,
@@ -105,7 +145,7 @@ export function StorySection() {
       // Each beat is addressable: its anchor is where its segment starts.
       sequenceBeats.forEach((beat, i) => {
         unregister.push(
-          registerBeatY(beat.slug, () => st.start + (i / SEGMENTS) * (st.end - st.start)),
+          registerBeatY(beat.slug, () => st.start + beatProgress(i) * (st.end - st.start)),
         );
       });
 
@@ -113,7 +153,7 @@ export function StorySection() {
       const hash = window.location.hash.replace('#beat-', '');
       const hashIndex = sequenceBeats.findIndex((beat) => beat.slug === hash);
       if (hashIndex >= 0) {
-        window.scrollTo({ top: st.start + (hashIndex / SEGMENTS) * (st.end - st.start) });
+        window.scrollTo({ top: st.start + beatProgress(hashIndex) * (st.end - st.start) });
       }
 
       return () => unregister.forEach((fn) => fn());
@@ -159,15 +199,17 @@ export function StorySection() {
           <ol className={styles.listInner}>
             {sequenceBeats.map((beat) => (
               <li key={beat.id} id={`beat-${beat.slug}`} className={styles.item}>
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
-                  className={styles.still}
-                  src={beat.poster}
-                  width={720}
-                  height={720}
-                  loading="lazy"
-                  alt=""
-                />
+                <picture className={styles.picture}>
+                  <source media={PHONE_QUERY} srcSet={beat.posterSm} />
+                  <img
+                    className={styles.still}
+                    src={beat.poster}
+                    width={720}
+                    height={720}
+                    loading="lazy"
+                    alt=""
+                  />
+                </picture>
                 <div className={styles.card}>
                   <p className={styles.num} aria-hidden="true">
                     {pad2(beat.index)}
@@ -185,6 +227,8 @@ export function StorySection() {
     );
   }
 
+  const small = frameSet === 'small';
+
   return (
     <>
       {lead}
@@ -200,16 +244,17 @@ export function StorySection() {
         ))}
         <div className={styles.stage}>
           <div className={styles.media}>
-            {mode === 'pinned' ? (
+            {mode === 'pinned' && frameSet !== null ? (
               <ScrollSequence
                 ref={seqRef}
-                segments={FRAME_SETS}
-                poster={STORY_POSTER}
+                segments={small ? SMALL_FRAME_SETS : FRAME_SETS}
+                poster={small ? STORY_POSTER_SM : STORY_POSTER}
                 alt={STORY_ALT}
+                concurrency={small ? 4 : 6}
+                capToFrame={small}
               />
             ) : (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img className={styles.poster} src={STORY_POSTER} alt={STORY_ALT} />
+              <StoryPoster />
             )}
           </div>
           <div className={styles.copy}>

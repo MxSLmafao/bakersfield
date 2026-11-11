@@ -12,7 +12,7 @@ const BEAT_LINK = '#beat-';
 
 /**
  * Starts Lenis smooth scrolling and keeps it in step with GSAP ScrollTrigger.
- * Smooth scroll is not started when the visitor asks for reduced motion.
+ * Smooth scroll is not started for reduced motion, or on touch screens.
  * Beat links (#beat-<slug>) always go through scrollToBeat, so they land on the
  * right story position. Renders nothing.
  */
@@ -30,11 +30,14 @@ export function SmoothScroll() {
     document.addEventListener('click', onClick);
 
     const reduce = window.matchMedia('(prefers-reduced-motion: reduce)');
+    // Touch screens keep native scrolling and momentum. Lenis is not started there.
+    // The scroll helpers then use window.scrollTo with behavior 'smooth'.
+    const coarse = window.matchMedia('(pointer: coarse)');
     let lenis: Lenis | null = null;
     let onTick: ((time: number) => void) | null = null;
     let onLenisScroll: (() => void) | null = null;
 
-    if (!reduce.matches) {
+    if (!reduce.matches && !coarse.matches) {
       lenis = new Lenis({
         duration: 1.1,
         easing: (t: number) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),

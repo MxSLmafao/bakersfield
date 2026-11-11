@@ -17,12 +17,21 @@ export type Beat = {
   title: string;
   body: string;
   kind: BeatKind;
+  /** Desktop frames, 720px. */
   frames?: FrameSet;
   poster?: string;
+  /** Small frames for phones and slow connections, 480px. */
+  framesSm?: FrameSet;
+  posterSm?: string;
 };
 
 /** A beat that plays a frame sequence. */
-export type SequenceBeat = Beat & { frames: FrameSet; poster: string };
+export type SequenceBeat = Beat & {
+  frames: FrameSet;
+  poster: string;
+  framesSm: FrameSet;
+  posterSm: string;
+};
 
 const sequence = (slug: string, index: number, id: string, title: string, body: string): Beat => ({
   id,
@@ -33,6 +42,8 @@ const sequence = (slug: string, index: number, id: string, title: string, body: 
   kind: 'sequence',
   frames: { dir: `/frames/${slug}`, count: 60, ext: 'webp' },
   poster: `/frames/${slug}/poster.webp`,
+  framesSm: { dir: `/frames-sm/${slug}`, count: 41, ext: 'webp' },
+  posterSm: `/frames-sm/${slug}/poster.webp`,
 });
 
 export const beats: readonly Beat[] = [
@@ -98,5 +109,9 @@ export const beats: readonly Beat[] = [
 
 export const sequenceBeats: readonly SequenceBeat[] = beats.filter(
   (beat): beat is SequenceBeat =>
-    beat.kind === 'sequence' && beat.frames !== undefined && beat.poster !== undefined,
+    beat.kind === 'sequence' &&
+    beat.frames !== undefined &&
+    beat.poster !== undefined &&
+    beat.framesSm !== undefined &&
+    beat.posterSm !== undefined,
 );

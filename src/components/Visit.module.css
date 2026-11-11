@@ -4,8 +4,10 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 80px var(--gutter);
+  padding: 80px var(--gutter) calc(80px + env(safe-area-inset-bottom, 0px));
   background: var(--butter);
+  content-visibility: auto;
+  contain-intrinsic-size: auto 100svh;
 }
 
 .card {
@@ -43,6 +45,8 @@
 .button {
   margin-top: 28px;
   min-height: var(--touch);
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -61,20 +65,41 @@
     background-color 120ms var(--ease-out);
 }
 
-.button:hover {
-  transform: translate(0, -2px);
-  box-shadow: 4px 6px 0 var(--ink);
-  background: var(--amber);
-}
-
 .button:active {
   transform: translate(4px, 4px);
   box-shadow: 0 0 0 var(--ink);
+  background: var(--amber);
+}
+
+/* The lift is a bonus on mouse screens only. Touch has no hover state. */
+@media (hover: hover) {
+  .button:hover {
+    transform: translate(0, -2px);
+    box-shadow: 4px 6px 0 var(--ink);
+    background: var(--amber);
+  }
 }
 
 .button:focus-visible {
   outline: 3px solid var(--ink);
   outline-offset: 4px;
+}
+
+/* Phones: full-width button, roomier card. */
+@media (max-width: 767px) {
+  .visit {
+    padding: 56px var(--gutter) calc(56px + env(safe-area-inset-bottom, 0px));
+  }
+
+  .card {
+    padding: 24px 20px;
+    box-shadow: 6px 6px 0 var(--ink);
+  }
+
+  .button {
+    width: 100%;
+    min-height: 48px;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {

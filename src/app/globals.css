@@ -86,6 +86,13 @@ canvas {
   display: none !important;
 }
 
+/* Touch: no double-tap zoom delay, no grey flash. Press states are shown instead. */
+a,
+button {
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+}
+
 h1,
 h2,
 h3,
