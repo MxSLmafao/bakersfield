@@ -1,0 +1,83 @@
+/* ============================================================================
+   instyle.group Liquid Glass Design System — design tokens
+   ----------------------------------------------------------------------------
+   Drop this into your project's stylesheet entry (e.g. src/styles/tokens.css)
+   and reference the variables below. Do not hardcode hex colors elsewhere.
+   ============================================================================ */
+
+:root {
+  /* ── Base palette (warm neutral) ──────────────────── */
+  --color-bg:          #EDE9E0;
+  --color-surface:     #F3F1EE;
+  --color-surface-2:   #E6E2D7;
+  --color-surface-3:   #E1DCD0;
+
+  --color-text:         #35362D;
+  --color-text-muted:   #82837A;
+  --color-text-light:   #C4C1B0;
+  --color-text-inv:     #F3F1EE;   /* on dark glass */
+
+  --color-success:     #7BB785;
+  --color-warning:     #D4772C;
+  --color-error:       #C6292C;
+  --color-info:        #38537B;
+
+  /* Highlight — marker / pen-style emphasis on inline text only.
+     Never use as a fill for CTAs, panels, badges, or icon backgrounds. */
+  --color-highlight:   #E2DD2A;
+
+  /* ── Glass material tokens (the core of Liquid) ───── */
+  --glass-light:    rgba(255, 255, 255, 0.55);   /* brightest */
+  --glass-warm:     rgba(243, 241, 238, 0.58);   /* default warm */
+  --glass-tinted:   rgba(196, 193, 176, 0.42);   /* accent */
+  --glass-dark:     rgba( 32,  33,  26, 0.78);   /* sidebar / header */
+
+  --glass-border-l: rgba(255, 255, 255, 0.80);
+  --glass-border-w: rgba(255, 255, 255, 0.62);
+  --glass-border-d: rgba(255, 255, 255, 0.13);
+
+  --glass-blur-sm:  saturate(180%) blur(16px);
+  --glass-blur:     saturate(200%) blur(24px);
+  --glass-blur-lg:  saturate(220%) blur(40px);
+
+  --glass-shadow-sm: 0 2px 12px  rgba(53,54,45,.09), 0 1px 4px  rgba(53,54,45,.07);
+  --glass-shadow:    0 8px 32px  rgba(53,54,45,.11), 0 2px 8px  rgba(53,54,45,.08);
+  --glass-shadow-lg: 0 20px 64px rgba(53,54,45,.16), 0 4px 16px rgba(53,54,45,.10);
+
+  /* Specular highlight insets — pair with every glass surface */
+  --glass-hl:    inset 0 1px 0 rgba(255,255,255,.90), inset 0 -1px 0 rgba(0,0,0,.055);
+  --glass-hl-d:  inset 0 1px 0 rgba(255,255,255,.18), inset 0 -1px 0 rgba(0,0,0,.22);
+
+  /* ── Radii ────────────────────────────────────────── */
+  --r-sm:   10px;
+  --r:      16px;
+  --r-lg:   24px;
+  --r-xl:   32px;
+  --r-pill: 999px;
+
+  /* ── Corner shape (CSS Borders Level 4 — superellipse / squircle) ── */
+  --corner-shape:      superellipse(2.5);  /* default */
+  --corner-shape-soft: superellipse(2);    /* rounder */
+  --corner-shape-hard: superellipse(3.5);  /* squarer, for large panels */
+
+  /* ── Typography & motion ──────────────────────────── */
+  --font-sans:    'Gen Interface JP', sans-serif;
+  --font-display: 'Gen Interface JP Display', 'Gen Interface JP', sans-serif;  /* headings (h1–h4) */
+
+  --ease-out:    250ms cubic-bezier(.4, 0, .2, 1);
+  --ease-spring: 380ms cubic-bezier(.34, 1.56, .64, 1);
+}
+
+/* Apply continuous-curvature corner shape to all elements.
+   Browsers without `corner-shape` support fall back to standard border-radius. */
+* { corner-shape: var(--corner-shape); }
+
+/* Headings use the Display variant. */
+h1, h2, h3, h4 { font-family: var(--font-display); }
+
+/* Larger panels look more iOS-like with the harder superellipse. */
+.glass-panel,
+.dashboard,
+.canon-slide {
+  corner-shape: var(--corner-shape-hard);
+}

@@ -1,0 +1,1242 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>instyle.group Design System — Liquid Glass</title>
+  <link rel="icon" href="ig_favicon_2026.png">
+  <meta property="og:title" content="instyle.group Design System — Liquid Glass">
+  <meta property="og:description" content="カラー / タイポグラフィ / コンポーネント / レイアウト — Liquid Glass Preview">
+  <meta property="og:image" content="ig_ogp_2026-100.jpg">
+  <meta property="og:type" content="website">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:image" content="ig_ogp_2026-100.jpg">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/gen-interface-jp@0.1.2/all.css">
+  <style>
+    :root {
+      /* instyle.group palette */
+      --color-bg:          #EDE9E0;
+      --color-text:        #35362D;
+      --color-text-muted:  #82837A;
+      --color-text-light:  #C4C1B0;
+      --color-text-inv:    #F3F1EE;
+      --color-success:     #7BB785;
+      --color-warning:     #D4772C;
+      --color-error:       #C6292C;
+      --color-info:        #38537B;
+      --color-highlight:   #E2DD2A;
+
+      /* Liquid Glass tokens */
+      --glass-light:       rgba(255, 255, 255, 0.55);
+      --glass-warm:        rgba(243, 241, 238, 0.58);
+      --glass-dark:        rgba(32, 33, 26, 0.78);
+      --glass-tinted:      rgba(196, 193, 176, 0.42);
+
+      --glass-border-l:    rgba(255, 255, 255, 0.80);
+      --glass-border-w:    rgba(255, 255, 255, 0.62);
+      --glass-border-d:    rgba(255, 255, 255, 0.13);
+
+      --glass-blur-sm:     saturate(180%) blur(16px);
+      --glass-blur:        saturate(200%) blur(24px);
+      --glass-blur-lg:     saturate(220%) blur(40px);
+
+      --glass-shadow-sm:   0 2px 12px rgba(53,54,45,.09), 0 1px 4px rgba(53,54,45,.07);
+      --glass-shadow:      0 8px 32px rgba(53,54,45,.11), 0 2px 8px rgba(53,54,45,.08);
+      --glass-shadow-lg:   0 20px 64px rgba(53,54,45,.16), 0 4px 16px rgba(53,54,45,.10);
+
+      --glass-hl:          inset 0 1px 0 rgba(255,255,255,.90), inset 0 -1px 0 rgba(0,0,0,.055);
+      --glass-hl-d:        inset 0 1px 0 rgba(255,255,255,.18), inset 0 -1px 0 rgba(0,0,0,.22);
+
+      --r-sm:  10px;
+      --r:     16px;
+      --r-lg:  24px;
+      --r-xl:  32px;
+      --r-pill:999px;
+
+      /* クロソイド式角丸（CSS Borders Level 4） */
+      --corner-shape:      superellipse(2.5);
+      --corner-shape-soft: superellipse(2);
+      --corner-shape-hard: superellipse(3.5);
+
+      --font-sans:    'Gen Interface JP', sans-serif;
+      --font-display: 'Gen Interface JP Display', 'Gen Interface JP', sans-serif;
+      --ease-out: 250ms cubic-bezier(.4,0,.2,1);
+      --ease-spring: 380ms cubic-bezier(.34,1.56,.64,1);
+    }
+
+    *, *::before, *::after { box-sizing:border-box; margin:0; padding:0; corner-shape: var(--corner-shape); }
+    .glass-panel, .dashboard-demo, .canon-slide { corner-shape: var(--corner-shape-hard); }
+
+    html { background:#EDE9E0; }
+
+    body {
+      font-family: var(--font-sans);
+      color: var(--color-text);
+      font-size: 1rem;
+      line-height: 1.7;
+      -webkit-font-smoothing: antialiased;
+      min-height: 100vh;
+    }
+
+    h1, h2, h3, h4 { font-family: var(--font-display); }
+
+    /* ── Fixed ambient background ── */
+    .scene-bg {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      background: #EDE9E0;
+      overflow: hidden;
+      pointer-events: none;
+    }
+    .scene-bg::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(ellipse 72% 65% at  8%  6%, rgba(196,193,176,.58) 0%, transparent 55%),
+        radial-gradient(ellipse 55% 55% at 94% 10%, rgba(230,226,215,.65) 0%, transparent 52%),
+        radial-gradient(ellipse 52% 68% at 78% 88%, rgba(196,193,176,.42) 0%, transparent 55%),
+        radial-gradient(ellipse 66% 46% at 18% 92%, rgba(230,226,215,.52) 0%, transparent 55%),
+        radial-gradient(ellipse 42% 42% at 50% 48%, rgba(243,241,238,.32) 0%, transparent 52%);
+    }
+
+    /* Content sits above scene */
+    .page-header, .nav-wrap, .container, footer { position:relative; z-index:1; }
+
+    /* ── HEADER ── */
+    .page-header {
+      padding: 64px;
+      overflow: hidden;
+    }
+    .page-header::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: var(--glass-dark);
+      backdrop-filter: var(--glass-blur-lg);
+      -webkit-backdrop-filter: var(--glass-blur-lg);
+    }
+    /* Iridescent prismatic strip */
+    .page-header::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(105deg,
+        rgba(255, 90,100,.05)  0%,
+        rgba(255,210, 80,.05) 18%,
+        rgba( 60,220,160,.06) 34%,
+        rgba( 80,160,255,.06) 50%,
+        rgba(160, 80,255,.05) 66%,
+        rgba(255, 80,180,.05) 82%,
+        transparent          100%
+      );
+      pointer-events: none;
+    }
+    .page-header-content { position:relative; z-index:1; }
+    .page-header h1 {
+      font-size: 2.25rem;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      margin-bottom: 8px;
+      color: var(--color-text-inv);
+    }
+    .page-header p { color: rgba(243,241,238,.50); font-size:.875rem; }
+
+    /* ── FLOATING PILL NAV ── */
+    .nav-wrap {
+      display: flex;
+      justify-content: center;
+      padding: 0 24px;
+      margin: 20px 0;
+      position: sticky;
+      top: 16px;
+      z-index: 100;
+    }
+    .nav {
+      display: inline-flex;
+      gap: 2px;
+      padding: 6px;
+      background: rgba(243,241,238,.68);
+      backdrop-filter: saturate(220%) blur(32px);
+      -webkit-backdrop-filter: saturate(220%) blur(32px);
+      border: 1px solid rgba(255,255,255,.80);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.92), inset 0 -1px 0 rgba(0,0,0,.05),
+                  0 8px 32px rgba(53,54,45,.14);
+      border-radius: var(--r-pill);
+    }
+    .nav a {
+      display: block;
+      padding: 8px 18px;
+      font-size: .8125rem;
+      font-weight: 500;
+      color: var(--color-text-muted);
+      text-decoration: none;
+      border-radius: var(--r-pill);
+      transition: all var(--ease-out);
+      white-space: nowrap;
+    }
+    .nav a:hover {
+      color: var(--color-text);
+      background: rgba(255,255,255,.60);
+    }
+
+    /* ── CONTAINER ── */
+    .container { max-width:1100px; margin:0 auto; padding:48px 32px 80px; }
+    .section   { margin-bottom:80px; }
+
+    .section-title {
+      font-size: .6875rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: .10em;
+      color: var(--color-text-muted);
+      margin-bottom: 32px;
+    }
+
+    /* ── GLASS PANEL (section wrapper) ── */
+    .glass-panel {
+      background: rgba(243,241,238,.50);
+      backdrop-filter: var(--glass-blur);
+      -webkit-backdrop-filter: var(--glass-blur);
+      border: 1px solid var(--glass-border-w);
+      box-shadow: var(--glass-hl), var(--glass-shadow);
+      border-radius: var(--r-xl);
+      padding: 36px;
+      position: relative;
+      overflow: hidden;
+    }
+    /* Top-edge specular line */
+    .glass-panel::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 10%; right: 10%;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,.85) 50%, transparent);
+      pointer-events: none;
+    }
+
+    /* ── COLOR SWATCHES ── */
+    .swatches { display:flex; flex-wrap:wrap; gap:12px; }
+    .swatch   { width:120px; }
+    .swatch-color {
+      height: 72px;
+      border-radius: var(--r-sm);
+      margin-bottom: 8px;
+      border: 1px solid rgba(255,255,255,.55);
+    }
+    .swatch-name { font-size:.75rem;   font-weight:600; }
+    .swatch-hex  { font-size:.6875rem; color:var(--color-text-muted); font-family:monospace; }
+
+    /* Glass material swatches */
+    .swatch-glass-color {
+      height: 72px;
+      border-radius: var(--r-sm);
+      margin-bottom: 8px;
+      backdrop-filter: var(--glass-blur-sm);
+      -webkit-backdrop-filter: var(--glass-blur-sm);
+      border: 1px solid rgba(255,255,255,.70);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.85);
+    }
+
+    /* ── TYPOGRAPHY ── */
+    .type-row     { display:flex; align-items:baseline; gap:24px; padding:20px 0; }
+    .type-label   { width:120px; font-size:.5rem; color:var(--color-text-muted); flex-shrink:0; }
+    /* Highlight marker — 本文中の立たせたい語句専用（蛍光ペン風） */
+    mark, .mark {
+      background: linear-gradient(180deg, transparent 60%, var(--color-highlight) 60%);
+      padding: 0 2px;
+      color: inherit;
+      font-weight: 600;
+    }
+    .type-display { font-size:3.6875rem; font-weight:100; line-height:1.00; letter-spacing:-.03em; color:var(--color-text); }
+    .type-h1      { font-size:2.75rem;   font-weight:300; line-height:1.05; letter-spacing:-.02em; }
+    .type-h2      { font-size:2.0625rem; font-weight:500; line-height:1.15; letter-spacing:-.01em; }
+    .type-h3      { font-size:1.5625rem; font-weight:600; line-height:1.25; }
+    .type-h4      { font-size:1.1875rem; font-weight:600; line-height:1.40; }
+    .type-body    { font-size:.875rem;   font-weight:400; line-height:1.70; }
+    .type-sm      { font-size:.6875rem;  font-weight:400; line-height:1.50; }
+    .type-caption { font-size:.5rem;     font-weight:400; line-height:1.40; color:var(--color-text-muted); }
+
+    /* ── BUTTONS ── */
+    .btn-row { display:flex; align-items:center; gap:12px; flex-wrap:wrap; }
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 10px 22px;
+      border-radius: var(--r-pill);
+      font-size: .875rem;
+      font-weight: 500;
+      font-family: var(--font-sans);
+      letter-spacing: .01em;
+      cursor: pointer;
+      border: none;
+      transition: all var(--ease-out);
+      position: relative;
+    }
+    .btn-primary {
+      background: rgba(32,33,26,.82);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      color: var(--color-text-inv);
+      border: 1px solid rgba(255,255,255,.14);
+      box-shadow: var(--glass-hl-d), 0 4px 16px rgba(53,54,45,.28);
+    }
+    .btn-primary:hover {
+      background: rgba(53,54,45,.90);
+      transform: translateY(-1px);
+      box-shadow: var(--glass-hl-d), 0 8px 24px rgba(53,54,45,.34);
+    }
+    .btn-secondary {
+      background: rgba(243,241,238,.65);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      color: var(--color-text);
+      border: 1px solid rgba(255,255,255,.78);
+      box-shadow: var(--glass-hl), var(--glass-shadow-sm);
+    }
+    .btn-secondary:hover {
+      background: rgba(255,255,255,.82);
+      transform: translateY(-1px);
+      box-shadow: var(--glass-hl), 0 6px 20px rgba(53,54,45,.13);
+    }
+    .btn-accent {
+      background: rgba(196,193,176,.48);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      color: var(--color-text);
+      border: 1px solid rgba(255,255,255,.68);
+      box-shadow: var(--glass-hl), var(--glass-shadow-sm);
+    }
+    .btn-accent:hover {
+      background: rgba(196,193,176,.68);
+      transform: translateY(-1px);
+    }
+    .btn-ghost {
+      background: transparent;
+      color: var(--color-text-muted);
+      border: 1px solid transparent;
+    }
+    .btn-ghost:hover {
+      background: rgba(243,241,238,.52);
+      color: var(--color-text);
+      border-color: rgba(255,255,255,.62);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+    }
+    .btn-sm { padding:6px 16px; font-size:.8125rem; }
+    .btn-lg { padding:14px 30px; font-size:1rem; }
+
+    /* ── CARDS ── */
+    .card-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:16px; }
+    .card {
+      background: rgba(243,241,238,.56);
+      backdrop-filter: var(--glass-blur-sm);
+      -webkit-backdrop-filter: var(--glass-blur-sm);
+      border: 1px solid rgba(255,255,255,.72);
+      box-shadow: var(--glass-hl), var(--glass-shadow-sm);
+      border-radius: var(--r);
+      padding: 24px;
+      transition: all var(--ease-out);
+      position: relative;
+      overflow: hidden;
+    }
+    .card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 10%; right: 10%;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,.88) 50%, transparent);
+    }
+    .card:hover {
+      transform: translateY(-2px);
+      background: rgba(255,255,255,.66);
+      box-shadow: var(--glass-hl), 0 16px 40px rgba(53,54,45,.13);
+    }
+    .card-label { font-size:.75rem; color:var(--color-text-muted); font-weight:500; text-transform:uppercase; letter-spacing:.06em; margin-bottom:8px; }
+    .card-value { font-size:2rem; font-weight:700; letter-spacing:-.02em; line-height:1; margin-bottom:4px; }
+    .card-sub   { font-size:.8125rem; color:var(--color-text-muted); }
+    .card-accent {
+      background: rgba(196,193,176,.42);
+      border-color: rgba(255,255,255,.65);
+    }
+    .card-accent:hover { background: rgba(196,193,176,.60); }
+    .card-dark {
+      background: var(--glass-dark);
+      border: 1px solid var(--glass-border-d);
+      box-shadow: var(--glass-hl-d), 0 8px 28px rgba(53,54,45,.22);
+    }
+    .card-dark::before { background: linear-gradient(90deg, transparent, rgba(255,255,255,.20) 50%, transparent); }
+    .card-dark:hover   { background: rgba(53,54,45,.84); }
+    .card-dark .card-label { color: rgba(243,241,238,.48); }
+    .card-dark .card-value { color: var(--color-text-inv); }
+    .card-dark .card-sub   { color: rgba(243,241,238,.38); }
+
+    /* ── BADGES ── */
+    .badge-row { display:flex; gap:8px; flex-wrap:wrap; align-items:center; }
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      padding: 4px 12px;
+      border-radius: var(--r-pill);
+      font-size: .75rem;
+      font-weight: 500;
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      border: 1px solid transparent;
+    }
+    .badge-default { background:rgba(196,193,176,.38); color:var(--color-text-muted); border-color:rgba(255,255,255,.58); }
+    .badge-success { background:rgba(22,163,74,.14);   color:#15803D; border-color:rgba(22,163,74,.24); }
+    .badge-warning { background:rgba(217,119,6,.14);   color:#B45309; border-color:rgba(217,119,6,.24); }
+    .badge-error   { background:rgba(198,41,44,.12);   color:#B91C1C; border-color:rgba(198,41,44,.22); }
+    .badge-info    { background:rgba(37,99,235,.12);   color:#1D4ED8; border-color:rgba(37,99,235,.22); }
+    .badge-accent  { background:rgba(130,131,122,.28); color:var(--color-text); border-color:rgba(255,255,255,.52); }
+
+    /* ── TABLE ── */
+    .table-wrap {
+      border-radius: var(--r);
+      overflow: hidden;
+      background: rgba(243,241,238,.50);
+      backdrop-filter: var(--glass-blur);
+      -webkit-backdrop-filter: var(--glass-blur);
+      border: 1px solid rgba(255,255,255,.68);
+      box-shadow: var(--glass-hl), var(--glass-shadow);
+    }
+    table { width:100%; border-collapse:collapse; font-size:.875rem; }
+    th {
+      background: rgba(230,226,215,.60);
+      color: var(--color-text-muted);
+      font-size: .6875rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: .07em;
+      padding: 12px 16px;
+      text-align: left;
+    }
+    td { padding:12px 16px; color:var(--color-text); background:transparent; }
+    tr:nth-child(even) td { background:rgba(230,226,215,.28); }
+    tr:not(:last-child) td { border-bottom:1px solid rgba(255,255,255,.42); }
+
+    /* ── FORM ── */
+    .form-row   { display:flex; gap:16px; align-items:flex-start; flex-wrap:wrap; }
+    .form-group { flex:1; min-width:200px; }
+    .form-label { display:block; font-size:.8125rem; font-weight:500; margin-bottom:6px; }
+    .input {
+      width: 100%;
+      padding: 10px 16px;
+      background: rgba(255,255,255,.55);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid rgba(255,255,255,.78);
+      border-radius: var(--r-sm);
+      font-size: .875rem;
+      font-family: var(--font-sans);
+      color: var(--color-text);
+      transition: all 150ms ease;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.85), 0 2px 8px rgba(53,54,45,.06);
+    }
+    .input:focus {
+      outline: none;
+      background: rgba(255,255,255,.78);
+      border-color: rgba(255,255,255,.92);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.95), 0 0 0 3px rgba(196,193,176,.38), 0 2px 8px rgba(53,54,45,.08);
+    }
+    .input::placeholder { color:var(--color-text-light); }
+    select.input { cursor:pointer; }
+
+    /* ── CHARTS ── */
+    .chart-area {
+      background: rgba(243,241,238,.48);
+      backdrop-filter: var(--glass-blur-sm);
+      -webkit-backdrop-filter: var(--glass-blur-sm);
+      border: 1px solid rgba(255,255,255,.66);
+      box-shadow: var(--glass-hl), 0 4px 20px rgba(53,54,45,.08);
+      border-radius: var(--r);
+      padding: 24px;
+    }
+    .chart-title { font-size:.875rem; font-weight:600; margin-bottom:24px; }
+    .bars { display:flex; align-items:flex-end; gap:12px; height:160px; }
+    .bar-wrap { flex:1; display:flex; flex-direction:column; align-items:center; gap:8px; height:100%; justify-content:flex-end; }
+    .bar {
+      width: 100%;
+      border-radius: 6px 6px 0 0;
+      transition: opacity 150ms ease;
+      backdrop-filter: blur(4px);
+      border: 1px solid rgba(255,255,255,.45);
+    }
+    .bar:hover { opacity:.72; }
+    .bar-label { font-size:.6875rem; color:var(--color-text-muted); text-align:center; }
+    .bar-val   { font-size:.75rem; font-weight:600; }
+
+    /* ── SPACERS ── */
+    .divider { height:0; margin:56px 0; }
+
+    /* ── SPACING DEMO ── */
+    .spacing-row  { display:flex; align-items:center; gap:12px; margin-bottom:8px; }
+    .spacing-box  {
+      background: rgba(130,131,122,.38);
+      backdrop-filter: blur(6px);
+      border: 1px solid rgba(255,255,255,.55);
+      border-radius: 3px;
+      height: 24px;
+    }
+    .spacing-label { font-size:.75rem; color:var(--color-text-muted); width:80px; flex-shrink:0; }
+
+    /* ── DASHBOARD DEMO ── */
+    .dashboard-demo {
+      border-radius: var(--r-xl);
+      overflow: hidden;
+      display: grid;
+      grid-template-columns: 1fr 1.414fr; /* 白銀比 √2 */
+      height: 320px;
+      border: 1px solid rgba(255,255,255,.55);
+      box-shadow: 0 24px 72px rgba(53,54,45,.18);
+    }
+    .demo-sidebar {
+      background: rgba(28,29,22,.84);
+      backdrop-filter: var(--glass-blur-lg);
+      -webkit-backdrop-filter: var(--glass-blur-lg);
+      border-right: 1px solid rgba(255,255,255,.10);
+      padding: 24px 0;
+    }
+    .demo-sidebar-logo {
+      padding: 0 20px 24px;
+      font-size: .8125rem; font-weight:700;
+      color: rgba(243,241,238,.90);
+      letter-spacing: .05em; text-transform:uppercase;
+      margin-bottom: 8px;
+    }
+    .demo-nav-item {
+      padding: 8px 12px;
+      margin: 0 8px;
+      font-size: .8125rem;
+      color: rgba(243,241,238,.42);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 150ms ease;
+      border-radius: 8px;
+    }
+    .demo-nav-item:hover  { background:rgba(243,241,238,.10); color:rgba(243,241,238,.85); }
+    .demo-nav-item.active { background:rgba(243,241,238,.16); color:rgba(243,241,238,.95); }
+    .demo-main {
+      background: rgba(237,233,224,.68);
+      backdrop-filter: saturate(180%) blur(24px);
+      -webkit-backdrop-filter: saturate(180%) blur(24px);
+      padding: 24px;
+      overflow: hidden;
+    }
+    .demo-kpi { display:grid; grid-template-columns:repeat(3,1fr); gap:10px; margin-bottom:16px; }
+    .demo-kpi-card {
+      background: rgba(255,255,255,.55);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid rgba(255,255,255,.78);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.90), 0 2px 8px rgba(53,54,45,.06);
+      border-radius: var(--r-sm);
+      padding: 14px;
+    }
+    .demo-kpi-card-accent { background:rgba(196,193,176,.38); border-color:rgba(255,255,255,.65); }
+    .demo-kpi-label { font-size:.6875rem; color:var(--color-text-muted); font-weight:500; text-transform:uppercase; letter-spacing:.06em; margin-bottom:6px; }
+    .demo-kpi-val   { font-size:1.5rem; font-weight:700; letter-spacing:-.02em; }
+    .demo-kpi-sub   { font-size:.6875rem; color:var(--color-text-muted); margin-top:2px; }
+
+    /* ── LIQUID GLASS MATERIALS SHOWCASE ── */
+    .materials-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+      margin-bottom: 32px;
+    }
+    .material-tile {
+      height: 100px;
+      border-radius: var(--r);
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      padding: 12px 14px;
+      position: relative;
+      overflow: hidden;
+    }
+    .material-label { font-size:.6875rem; font-weight:600; letter-spacing:.04em; }
+    .material-desc  { font-size:.5625rem; margin-top:2px; opacity:.65; }
+
+    .mat-light {
+      background: rgba(255,255,255,.55);
+      backdrop-filter: var(--glass-blur);
+      -webkit-backdrop-filter: var(--glass-blur);
+      border: 1px solid rgba(255,255,255,.82);
+      box-shadow: var(--glass-hl), var(--glass-shadow);
+    }
+    .mat-warm {
+      background: rgba(243,241,238,.58);
+      backdrop-filter: var(--glass-blur);
+      -webkit-backdrop-filter: var(--glass-blur);
+      border: 1px solid rgba(255,255,255,.70);
+      box-shadow: var(--glass-hl), var(--glass-shadow);
+    }
+    .mat-tinted {
+      background: rgba(196,193,176,.45);
+      backdrop-filter: var(--glass-blur);
+      -webkit-backdrop-filter: var(--glass-blur);
+      border: 1px solid rgba(255,255,255,.65);
+      box-shadow: var(--glass-hl), var(--glass-shadow);
+    }
+    .mat-dark {
+      background: rgba(32,33,26,.78);
+      backdrop-filter: var(--glass-blur);
+      -webkit-backdrop-filter: var(--glass-blur);
+      border: 1px solid rgba(255,255,255,.13);
+      box-shadow: var(--glass-hl-d), var(--glass-shadow);
+      color: var(--color-text-inv);
+    }
+
+    /* Specular top line on all tiles */
+    .material-tile::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 8%; right: 8%;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,.85) 50%, transparent);
+    }
+
+    /* ── FOOTER ── */
+    footer {
+      background: rgba(243,241,238,.55);
+      backdrop-filter: var(--glass-blur-sm);
+      -webkit-backdrop-filter: var(--glass-blur-sm);
+      border-top: 1px solid rgba(255,255,255,.65);
+      padding: 24px 64px;
+      font-size: .75rem;
+      color: var(--color-text-muted);
+      display: flex;
+      justify-content: space-between;
+    }
+
+    @media (max-width:768px) {
+      .page-header { padding:40px 24px; }
+      .nav a { padding:8px 12px; }
+      .container { padding:32px 16px 64px; }
+      .card-grid  { grid-template-columns:1fr; }
+      .materials-grid { grid-template-columns:repeat(2,1fr); }
+      .dashboard-demo { grid-template-columns:1fr; height:auto; }
+      .demo-sidebar { display:none; }
+      .glass-panel { padding:20px; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- Ambient scene background -->
+<div class="scene-bg"></div>
+
+<!-- HEADER -->
+<header class="page-header">
+  <div class="page-header-content">
+    <img src="ig_logo_2026.svg" alt="instyle.group" style="height:14px; filter:brightness(0) invert(1); display:block; margin-bottom:16px;">
+    <p>Liquid Glass Edition — カラー / タイポグラフィ / コンポーネント / レイアウト</p>
+  </div>
+</header>
+
+<!-- FLOATING PILL NAV -->
+<div class="nav-wrap">
+  <nav class="nav">
+    <a href="#glass">Glass</a>
+    <a href="#colors">カラー</a>
+    <a href="#typography">タイポグラフィ</a>
+    <a href="#components">コンポーネント</a>
+    <a href="#data">データ</a>
+    <a href="#layout">レイアウト</a>
+    <a href="#principles">デザイン原則</a>
+  </nav>
+</div>
+
+<div class="container">
+
+  <!-- ═══ LIQUID GLASS MATERIALS ═══ -->
+  <section class="section glass-panel" id="glass">
+    <p class="section-title">Liquid Glass — Material Tokens</p>
+
+    <div class="materials-grid">
+      <div class="material-tile mat-light">
+        <div class="material-label">Light Glass</div>
+        <div class="material-desc">rgba(255,255,255,.55) · blur 24px</div>
+      </div>
+      <div class="material-tile mat-warm">
+        <div class="material-label">Warm Glass</div>
+        <div class="material-desc">rgba(243,241,238,.58) · blur 24px</div>
+      </div>
+      <div class="material-tile mat-tinted">
+        <div class="material-label">Tinted Glass</div>
+        <div class="material-desc">rgba(196,193,176,.45) · blur 24px</div>
+      </div>
+      <div class="material-tile mat-dark">
+        <div class="material-label">Dark Glass</div>
+        <div class="material-desc">rgba(32,33,26,.78) · blur 24px</div>
+      </div>
+    </div>
+
+    <p style="font-size:.8125rem; color:var(--color-text-muted); margin-bottom:20px;">CSS プロパティ</p>
+    <div style="display:grid; grid-template-columns:repeat(3,1fr); gap:12px;">
+      <div style="background:rgba(255,255,255,.40); border:1px solid rgba(255,255,255,.65); border-radius:var(--r-sm); padding:14px;">
+        <div style="font-size:.6875rem; font-weight:600; text-transform:uppercase; letter-spacing:.07em; color:var(--color-text-muted); margin-bottom:6px;">Blur</div>
+        <div style="font-size:.8125rem; font-family:monospace;">blur(24px) saturate(200%)</div>
+      </div>
+      <div style="background:rgba(255,255,255,.40); border:1px solid rgba(255,255,255,.65); border-radius:var(--r-sm); padding:14px;">
+        <div style="font-size:.6875rem; font-weight:600; text-transform:uppercase; letter-spacing:.07em; color:var(--color-text-muted); margin-bottom:6px;">Border</div>
+        <div style="font-size:.8125rem; font-family:monospace;">rgba(255,255,255,.70–.82)</div>
+      </div>
+      <div style="background:rgba(255,255,255,.40); border:1px solid rgba(255,255,255,.65); border-radius:var(--r-sm); padding:14px;">
+        <div style="font-size:.6875rem; font-weight:600; text-transform:uppercase; letter-spacing:.07em; color:var(--color-text-muted); margin-bottom:6px;">Highlight</div>
+        <div style="font-size:.8125rem; font-family:monospace;">inset 0 1px 0 rgba(255,255,255,.90)</div>
+      </div>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- ═══ COLORS ═══ -->
+  <section class="section glass-panel" id="colors">
+    <p class="section-title">Color Palette</p>
+
+    <p style="font-size:.8125rem; color:var(--color-text-muted); margin-bottom:20px;">ベース</p>
+    <div class="swatches" style="margin-bottom:32px;">
+      <div class="swatch">
+        <div class="swatch-color" style="background:#FFFFFF;"></div>
+        <div class="swatch-name">Background</div>
+        <div class="swatch-hex">#FFFFFF</div>
+      </div>
+      <div class="swatch">
+        <div class="swatch-color" style="background:#F3F1EE;"></div>
+        <div class="swatch-name">Surface</div>
+        <div class="swatch-hex">#F3F1EE</div>
+      </div>
+      <div class="swatch">
+        <div class="swatch-color" style="background:#E6E2D7;"></div>
+        <div class="swatch-name">Surface 2</div>
+        <div class="swatch-hex">#E6E2D7</div>
+      </div>
+      <div class="swatch">
+        <div class="swatch-color" style="background:#E1DCD0;"></div>
+        <div class="swatch-name">Surface 3</div>
+        <div class="swatch-hex">#E1DCD0</div>
+      </div>
+      <div class="swatch">
+        <div class="swatch-color" style="background:#C4C1B0;"></div>
+        <div class="swatch-name">Muted</div>
+        <div class="swatch-hex">#C4C1B0</div>
+      </div>
+      <div class="swatch">
+        <div class="swatch-color" style="background:#82837A;"></div>
+        <div class="swatch-name">Text Muted</div>
+        <div class="swatch-hex">#82837A</div>
+      </div>
+      <div class="swatch">
+        <div class="swatch-color" style="background:#35362D;"></div>
+        <div class="swatch-name">Text</div>
+        <div class="swatch-hex">#35362D</div>
+      </div>
+    </div>
+
+    <p style="font-size:.8125rem; color:var(--color-text-muted); margin-bottom:20px;">Glass トークン（透明度つき）</p>
+    <div class="swatches" style="margin-bottom:32px;">
+      <div class="swatch">
+        <div class="swatch-glass-color" style="background:rgba(255,255,255,.55);"></div>
+        <div class="swatch-name">Light Glass</div>
+        <div class="swatch-hex">opacity .55</div>
+      </div>
+      <div class="swatch">
+        <div class="swatch-glass-color" style="background:rgba(243,241,238,.58);"></div>
+        <div class="swatch-name">Warm Glass</div>
+        <div class="swatch-hex">opacity .58</div>
+      </div>
+      <div class="swatch">
+        <div class="swatch-glass-color" style="background:rgba(196,193,176,.45);"></div>
+        <div class="swatch-name">Tinted Glass</div>
+        <div class="swatch-hex">opacity .45</div>
+      </div>
+      <div class="swatch">
+        <div class="swatch-glass-color" style="background:rgba(32,33,26,.78);"></div>
+        <div class="swatch-name">Dark Glass</div>
+        <div class="swatch-hex">opacity .78</div>
+      </div>
+    </div>
+
+    <p style="font-size:.8125rem; color:var(--color-text-muted); margin-bottom:20px;">ステータス</p>
+    <div class="swatches">
+      <div class="swatch">
+        <div class="swatch-color" style="background:#7BB785;"></div>
+        <div class="swatch-name">Success</div>
+        <div class="swatch-hex">#7BB785</div>
+      </div>
+      <div class="swatch">
+        <div class="swatch-color" style="background:#D4772C;"></div>
+        <div class="swatch-name">Warning</div>
+        <div class="swatch-hex">#D4772C</div>
+      </div>
+      <div class="swatch">
+        <div class="swatch-color" style="background:#C6292C;"></div>
+        <div class="swatch-name">Error</div>
+        <div class="swatch-hex">#C6292C</div>
+      </div>
+      <div class="swatch">
+        <div class="swatch-color" style="background:#38537B;"></div>
+        <div class="swatch-name">Info</div>
+        <div class="swatch-hex">#38537B</div>
+      </div>
+      <div class="swatch">
+        <div class="swatch-color" style="background:#E2DD2A;"></div>
+        <div class="swatch-name">Highlight</div>
+        <div class="swatch-hex">#E2DD2A</div>
+      </div>
+    </div>
+    <p style="font-size:.6875rem; color:var(--color-text-muted); margin-top:12px; line-height:1.6;">※ Highlight (#E2DD2A) は <code style="background:rgba(196,193,176,.32); padding:1px 4px; border-radius:3px; font-family:monospace; font-size:0.95em;">&lt;mark&gt;</code> による <mark>本文内ポイントマーキング</mark>専用。CTA / glass-panel の塗り / アイコン背景など面要素には使わない。1 ページ 2〜3 箇所まで。</p>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- ═══ TYPOGRAPHY ═══ -->
+  <section class="section glass-panel" id="typography">
+    <p class="section-title">Typography — Gen Interface JP (Display) / Modular Scale 1.333</p>
+    <p style="font-size:.8125rem; color:var(--color-text-muted); margin-bottom:24px;">モジュラースケール Perfect Fourth 1.333 / base 14px: 8 / 11 / 14 / 19 / 25 / 33 / 44 / 59 px</p>
+
+    <div class="type-row">
+      <span class="type-label">Display<br><strong style="color:var(--color-text-light);">59px</strong></span>
+      <span class="type-display">59</span>
+    </div>
+    <div class="type-row">
+      <span class="type-label">H1<br><strong style="color:var(--color-text-light);">44px</strong></span>
+      <span class="type-h1">見出し１</span>
+    </div>
+    <div class="type-row">
+      <span class="type-label">H2<br><strong style="color:var(--color-text-light);">33px</strong></span>
+      <span class="type-h2">見出し２ — Heading Two</span>
+    </div>
+    <div class="type-row">
+      <span class="type-label">H3<br><strong style="color:var(--color-text-light);">25px</strong></span>
+      <span class="type-h3">見出し３ — Heading Three</span>
+    </div>
+    <div class="type-row">
+      <span class="type-label">H4<br><strong style="color:var(--color-text-light);">19px</strong></span>
+      <span class="type-h4">見出し４ — Heading Four</span>
+    </div>
+    <div class="type-row">
+      <span class="type-label">Body<br><strong style="color:var(--color-text-light);">14px</strong></span>
+      <span class="type-body">本文テキスト。読みやすさを最優先に行間 1.7。Body text.</span>
+    </div>
+    <div class="type-row">
+      <span class="type-label">Small<br><strong style="color:var(--color-text-light);">11px</strong></span>
+      <span class="type-sm">補足説明・メタ情報・ラベル。Labels, captions.</span>
+    </div>
+    <div class="type-row">
+      <span class="type-label">Caption<br><strong style="color:var(--color-text-light);">8px</strong></span>
+      <span class="type-caption">最小サイズ。チャート目盛り・脚注専用。</span>
+    </div>
+    <div class="type-row">
+      <span class="type-label">Mark<br><strong style="color:var(--color-text-light);">本文内</strong><br><span style="color:var(--color-text-muted); font-weight:400;">蛍光ペン</span></span>
+      <span class="type-body">本文の中で <mark>立たせたい語句</mark> をポイント的にマーキングする用途のみ。CTA や面要素には使わない。</span>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- ═══ COMPONENTS ═══ -->
+  <section class="section glass-panel" id="components">
+    <p class="section-title">Components</p>
+
+    <!-- Buttons -->
+    <p style="font-size:.8125rem; font-weight:600; margin-bottom:16px;">Buttons — Glass Pill</p>
+    <div class="btn-row" style="margin-bottom:12px;">
+      <button class="btn btn-primary">Primary</button>
+      <button class="btn btn-secondary">Secondary</button>
+      <button class="btn btn-accent">Accent</button>
+      <button class="btn btn-ghost">Ghost</button>
+    </div>
+    <div class="btn-row" style="margin-bottom:40px;">
+      <button class="btn btn-primary btn-sm">Small</button>
+      <button class="btn btn-primary">Default</button>
+      <button class="btn btn-primary btn-lg">Large</button>
+    </div>
+
+    <!-- Badges -->
+    <p style="font-size:.8125rem; font-weight:600; margin-bottom:16px;">Badges — Frosted Pills</p>
+    <div class="badge-row" style="margin-bottom:40px;">
+      <span class="badge badge-default">Default</span>
+      <span class="badge badge-success">Success</span>
+      <span class="badge badge-warning">Warning</span>
+      <span class="badge badge-error">Error</span>
+      <span class="badge badge-info">Info</span>
+      <span class="badge badge-accent">Accent</span>
+    </div>
+
+    <!-- Cards -->
+    <p style="font-size:.8125rem; font-weight:600; margin-bottom:16px;">Cards — Layered Glass</p>
+    <div class="card-grid" style="margin-bottom:40px;">
+      <div class="card">
+        <div class="card-label">月間売上</div>
+        <div class="card-value">¥12.4M</div>
+        <div class="card-sub">前月比 +8.2%</div>
+      </div>
+      <div class="card card-accent">
+        <div class="card-label">新規顧客</div>
+        <div class="card-value">248</div>
+        <div class="card-sub">先月比 +12名</div>
+      </div>
+      <div class="card card-dark">
+        <div class="card-label">達成率</div>
+        <div class="card-value">94%</div>
+        <div class="card-sub">目標: 100%</div>
+      </div>
+    </div>
+
+    <!-- Forms -->
+    <p style="font-size:.8125rem; font-weight:600; margin-bottom:16px;">Form Inputs — Glass Fields</p>
+    <div class="form-row" style="margin-bottom:0;">
+      <div class="form-group">
+        <label class="form-label">氏名</label>
+        <input class="input" type="text" placeholder="山田 太郎">
+      </div>
+      <div class="form-group">
+        <label class="form-label">メールアドレス</label>
+        <input class="input" type="email" placeholder="taro@instyle.group">
+      </div>
+      <div class="form-group">
+        <label class="form-label">カテゴリ</label>
+        <select class="input">
+          <option>マーケティング</option>
+          <option>デザイン</option>
+          <option>エンジニアリング</option>
+        </select>
+      </div>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- ═══ DATA ═══ -->
+  <section class="section glass-panel" id="data">
+    <p class="section-title">Data Visualization</p>
+
+    <div style="display:grid; grid-template-columns:1fr 1.414fr; gap:16px; margin-bottom:24px;"> <!-- 白銀比 √2 -->
+      <!-- Bar Chart -->
+      <div class="chart-area">
+        <div class="chart-title">月次売上推移（百万円）</div>
+        <div class="bars">
+          <div class="bar-wrap">
+            <div class="bar-val" style="font-size:.625rem; color:var(--color-text-muted);">8.2</div>
+            <div class="bar" style="height:68%; background:rgba(230,226,215,.70);"></div>
+            <div class="bar-label">1月</div>
+          </div>
+          <div class="bar-wrap">
+            <div class="bar-val" style="font-size:.625rem; color:var(--color-text-muted);">9.1</div>
+            <div class="bar" style="height:76%; background:rgba(230,226,215,.70);"></div>
+            <div class="bar-label">2月</div>
+          </div>
+          <div class="bar-wrap">
+            <div class="bar-val" style="font-size:.625rem; color:var(--color-text-muted);">7.8</div>
+            <div class="bar" style="height:65%; background:rgba(230,226,215,.70);"></div>
+            <div class="bar-label">3月</div>
+          </div>
+          <div class="bar-wrap">
+            <div class="bar-val" style="font-size:.625rem; color:var(--color-text-muted);">10.5</div>
+            <div class="bar" style="height:87%; background:rgba(196,193,176,.72);"></div>
+            <div class="bar-label">4月</div>
+          </div>
+          <div class="bar-wrap">
+            <div class="bar-val" style="font-size:.625rem; color:var(--color-text-muted);">11.2</div>
+            <div class="bar" style="height:93%; background:rgba(196,193,176,.72);"></div>
+            <div class="bar-label">5月</div>
+          </div>
+          <div class="bar-wrap">
+            <div class="bar-val" style="font-size:.625rem; color:var(--color-text-muted);">12.4</div>
+            <div class="bar" style="height:100%; background:rgba(130,131,122,.65);"></div>
+            <div class="bar-label">6月</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Progress bars -->
+      <div class="chart-area">
+        <div class="chart-title">チャネル別比率</div>
+        <div style="display:flex; flex-direction:column; gap:14px; margin-top:8px;">
+          <div>
+            <div style="display:flex; justify-content:space-between; font-size:.8125rem; margin-bottom:6px;">
+              <span>直販</span><span style="font-weight:600;">42%</span>
+            </div>
+            <div style="height:8px; background:rgba(196,193,176,.30); border-radius:4px; border:1px solid rgba(255,255,255,.45);">
+              <div style="width:42%; height:100%; background:rgba(230,226,215,.85); border-radius:4px;"></div>
+            </div>
+          </div>
+          <div>
+            <div style="display:flex; justify-content:space-between; font-size:.8125rem; margin-bottom:6px;">
+              <span>EC</span><span style="font-weight:600;">31%</span>
+            </div>
+            <div style="height:8px; background:rgba(196,193,176,.30); border-radius:4px; border:1px solid rgba(255,255,255,.45);">
+              <div style="width:31%; height:100%; background:rgba(196,193,176,.80); border-radius:4px;"></div>
+            </div>
+          </div>
+          <div>
+            <div style="display:flex; justify-content:space-between; font-size:.8125rem; margin-bottom:6px;">
+              <span>代理店</span><span style="font-weight:600;">18%</span>
+            </div>
+            <div style="height:8px; background:rgba(196,193,176,.30); border-radius:4px; border:1px solid rgba(255,255,255,.45);">
+              <div style="width:18%; height:100%; background:rgba(130,131,122,.70); border-radius:4px;"></div>
+            </div>
+          </div>
+          <div>
+            <div style="display:flex; justify-content:space-between; font-size:.8125rem; margin-bottom:6px;">
+              <span>その他</span><span style="font-weight:600;">9%</span>
+            </div>
+            <div style="height:8px; background:rgba(196,193,176,.30); border-radius:4px; border:1px solid rgba(255,255,255,.45);">
+              <div style="width:9%; height:100%; background:rgba(230,226,215,.75); border-radius:4px;"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>ブランド名</th>
+            <th>売上（百万円）</th>
+            <th>前期比</th>
+            <th>ステータス</th>
+            <th>担当者</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>INSTYLE Flagship</td>
+            <td>84.2</td>
+            <td style="color:var(--color-success); font-weight:500;">+12.4%</td>
+            <td><span class="badge badge-success">達成</span></td>
+            <td style="color:var(--color-text-muted);">山田 太郎</td>
+          </tr>
+          <tr>
+            <td>CR Studio</td>
+            <td>31.7</td>
+            <td style="color:var(--color-success); font-weight:500;">+5.1%</td>
+            <td><span class="badge badge-success">達成</span></td>
+            <td style="color:var(--color-text-muted);">鈴木 花子</td>
+          </tr>
+          <tr>
+            <td>Digital Branch</td>
+            <td>19.3</td>
+            <td style="color:var(--color-warning); font-weight:500;">-2.8%</td>
+            <td><span class="badge badge-warning">進行中</span></td>
+            <td style="color:var(--color-text-muted);">佐藤 健</td>
+          </tr>
+          <tr>
+            <td>Media &amp; PR</td>
+            <td>8.9</td>
+            <td style="color:var(--color-error); font-weight:500;">-9.2%</td>
+            <td><span class="badge badge-error">要対応</span></td>
+            <td style="color:var(--color-text-muted);">田中 美咲</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- ═══ LAYOUT ═══ -->
+  <section class="section" id="layout">
+    <p class="section-title">Layout — 比率システム & Dashboard</p>
+
+    <p style="font-size:0.8125rem; font-weight:600; margin-bottom:16px;">比率システム</p>
+    <div style="display:flex; flex-direction:column; gap:10px; margin-bottom:40px;">
+      <div>
+        <div style="font-size:0.6875rem; text-transform:uppercase; letter-spacing:0.07em; color:var(--color-text-muted); margin-bottom:6px;">白銀比 √2 — 1 : 1.414 &nbsp;／&nbsp; サイドバー・2カラム・A4比率パネル（静か・端正）</div>
+        <div style="display:grid; grid-template-columns:1fr 1.414fr; gap:3px; height:36px; border-radius:var(--r-sm); overflow:hidden;">
+          <div style="background:var(--glass-dark); backdrop-filter:blur(8px); display:flex; align-items:center; justify-content:center;"><span style="color:var(--color-text-inv); font-size:0.625rem; font-weight:600;">1</span></div>
+          <div style="background:var(--glass-tinted); backdrop-filter:blur(8px); display:flex; align-items:center; justify-content:center; border:1px solid rgba(255,255,255,.45);"><span style="font-size:0.625rem; font-weight:600; color:var(--color-text-muted);">√2 = 1.414</span></div>
+        </div>
+      </div>
+      <div>
+        <div style="font-size:0.6875rem; text-transform:uppercase; letter-spacing:0.07em; color:var(--color-text-muted); margin-bottom:6px;">プラスチック数 ρ — 1 : 1.325 &nbsp;／&nbsp; カード・画像枠・モジュール（柔らかい・自然）</div>
+        <div style="display:grid; grid-template-columns:1fr 1.325fr; gap:3px; height:36px; border-radius:var(--r-sm); overflow:hidden;">
+          <div style="background:var(--glass-dark); backdrop-filter:blur(8px); display:flex; align-items:center; justify-content:center;"><span style="color:var(--color-text-inv); font-size:0.625rem; font-weight:600;">1</span></div>
+          <div style="background:var(--glass-tinted); backdrop-filter:blur(8px); display:flex; align-items:center; justify-content:center; border:1px solid rgba(255,255,255,.45);"><span style="font-size:0.625rem; font-weight:600; color:var(--color-text-muted);">ρ = 1.325</span></div>
+        </div>
+      </div>
+    </div>
+
+    <p style="font-size:0.8125rem; font-weight:600; margin-bottom:16px;">Dashboard Preview — 白銀比（1 : 1.414）</p>
+    <div class="dashboard-demo">
+      <div class="demo-sidebar">
+        <div class="demo-sidebar-logo"><img src="ig_logo_2026.svg" alt="instyle.group" style="height:14px; filter:brightness(0) invert(1); opacity:0.85; max-width:100%; display:block;"></div>
+        <div class="demo-nav-item active">
+          <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+          ダッシュボード
+        </div>
+        <div class="demo-nav-item">
+          <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 3h18v18H3z"/><path d="M3 9h18M9 21V9"/></svg>
+          レポート
+        </div>
+        <div class="demo-nav-item">
+          <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 8v4l3 3"/></svg>
+          スケジュール
+        </div>
+        <div class="demo-nav-item">
+          <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
+          チームメンバー
+        </div>
+        <div class="demo-nav-item">
+          <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 1v4M12 19v4M4.22 4.22l2.83 2.83M16.95 16.95l2.83 2.83M1 12h4M19 12h4M4.22 19.78l2.83-2.83M16.95 7.05l2.83-2.83"/></svg>
+          設定
+        </div>
+      </div>
+      <div class="demo-main">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+          <div>
+            <div style="font-size:1.125rem; font-weight:700; letter-spacing:-.02em;">ダッシュボード</div>
+            <div style="font-size:.75rem; color:var(--color-text-muted);">2026年4月 — 月次サマリー</div>
+          </div>
+          <button class="btn btn-primary btn-sm">レポート出力</button>
+        </div>
+        <div class="demo-kpi">
+          <div class="demo-kpi-card">
+            <div class="demo-kpi-label">総売上</div>
+            <div class="demo-kpi-val">¥144M</div>
+            <div class="demo-kpi-sub">前月比 <span style="color:var(--color-success)">+8.2%</span></div>
+          </div>
+          <div class="demo-kpi-card">
+            <div class="demo-kpi-label">新規顧客</div>
+            <div class="demo-kpi-val">248</div>
+            <div class="demo-kpi-sub">目標 200 <span style="color:var(--color-success)">達成</span></div>
+          </div>
+          <div class="demo-kpi-card demo-kpi-card-accent">
+            <div class="demo-kpi-label">達成率</div>
+            <div class="demo-kpi-val">94%</div>
+            <div class="demo-kpi-sub">残り <strong>6%</strong></div>
+          </div>
+        </div>
+        <div style="background:rgba(255,255,255,.45); backdrop-filter:blur(10px); -webkit-backdrop-filter:blur(10px); border:1px solid rgba(255,255,255,.72); border-radius:var(--r-sm); padding:16px;">
+          <div style="font-size:.75rem; font-weight:600; color:var(--color-text-muted); text-transform:uppercase; letter-spacing:.07em; margin-bottom:10px;">最新アクティビティ</div>
+          <div style="font-size:.8125rem; color:var(--color-text-muted); text-align:center; padding:16px 0;">データを読み込み中...</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- ═══ DESIGN PRINCIPLES ═══ -->
+  <section class="section glass-panel" id="principles">
+    <p class="section-title">Design Principles — ゲシュタルト / 五分割法 / Van de Graaf</p>
+
+    <!-- Gestalt -->
+    <p style="font-size:.8125rem; font-weight:600; margin-bottom:16px;">ゲシュタルト原則 — 情報整理の四原則</p>
+    <div style="display:grid; grid-template-columns:repeat(4, 1fr); gap:16px; margin-bottom:40px;">
+      <div style="background:var(--glass-warm); backdrop-filter:var(--glass-blur-sm); border:1px solid var(--glass-border-w); border-radius:var(--r); padding:16px; box-shadow:var(--glass-hl), var(--glass-shadow-sm);">
+        <div style="font-size:.6875rem; font-weight:600; color:var(--color-text); margin-bottom:8px; text-transform:uppercase; letter-spacing:.06em;">近接 Proximity</div>
+        <div style="font-size:.6875rem; color:var(--color-text-muted); line-height:1.5; margin-bottom:12px;">近い要素は仲間に見える</div>
+        <div style="display:flex; gap:14px;">
+          <div style="display:flex; flex-direction:column; gap:2px;"><div style="width:12px; height:12px; background:var(--glass-dark); border-radius:2px;"></div><div style="width:12px; height:12px; background:var(--glass-dark); border-radius:2px;"></div><div style="width:12px; height:12px; background:var(--glass-dark); border-radius:2px;"></div></div>
+          <div style="display:flex; flex-direction:column; gap:2px;"><div style="width:12px; height:12px; background:var(--glass-dark); border-radius:2px;"></div><div style="width:12px; height:12px; background:var(--glass-dark); border-radius:2px;"></div><div style="width:12px; height:12px; background:var(--glass-dark); border-radius:2px;"></div></div>
+        </div>
+      </div>
+      <div style="background:var(--glass-warm); backdrop-filter:var(--glass-blur-sm); border:1px solid var(--glass-border-w); border-radius:var(--r); padding:16px; box-shadow:var(--glass-hl), var(--glass-shadow-sm);">
+        <div style="font-size:.6875rem; font-weight:600; color:var(--color-text); margin-bottom:8px; text-transform:uppercase; letter-spacing:.06em;">類同 Similarity</div>
+        <div style="font-size:.6875rem; color:var(--color-text-muted); line-height:1.5; margin-bottom:12px;">同じ見た目は同じ役割</div>
+        <div style="display:grid; grid-template-columns:repeat(4, 1fr); gap:4px;">
+          <div style="aspect-ratio:1; background:var(--glass-dark); border-radius:2px;"></div>
+          <div style="aspect-ratio:1; background:var(--glass-tinted); border-radius:50%; border:1px solid rgba(255,255,255,.5);"></div>
+          <div style="aspect-ratio:1; background:var(--glass-dark); border-radius:2px;"></div>
+          <div style="aspect-ratio:1; background:var(--glass-dark); border-radius:2px;"></div>
+        </div>
+      </div>
+      <div style="background:var(--glass-warm); backdrop-filter:var(--glass-blur-sm); border:1px solid var(--glass-border-w); border-radius:var(--r); padding:16px; box-shadow:var(--glass-hl), var(--glass-shadow-sm);">
+        <div style="font-size:.6875rem; font-weight:600; color:var(--color-text); margin-bottom:8px; text-transform:uppercase; letter-spacing:.06em;">連続 Continuity</div>
+        <div style="font-size:.6875rem; color:var(--color-text-muted); line-height:1.5; margin-bottom:12px;">視線は流れに沿って動く</div>
+        <svg viewBox="0 0 100 40" style="width:100%; height:auto;">
+          <path d="M 0 30 Q 25 5, 50 20 T 100 10" fill="none" stroke="#35362D" stroke-width="2"/>
+          <circle cx="0" cy="30" r="3" fill="#35362D"/>
+          <circle cx="50" cy="20" r="3" fill="#35362D"/>
+          <circle cx="100" cy="10" r="3" fill="#35362D"/>
+        </svg>
+      </div>
+      <div style="background:var(--glass-warm); backdrop-filter:var(--glass-blur-sm); border:1px solid var(--glass-border-w); border-radius:var(--r); padding:16px; box-shadow:var(--glass-hl), var(--glass-shadow-sm);">
+        <div style="font-size:.6875rem; font-weight:600; color:var(--color-text); margin-bottom:8px; text-transform:uppercase; letter-spacing:.06em;">図と地 Figure / Ground</div>
+        <div style="font-size:.6875rem; color:var(--color-text-muted); line-height:1.5; margin-bottom:12px;">前景と背景を明確に</div>
+        <div style="background:var(--glass-tinted); backdrop-filter:blur(6px); border:1px solid rgba(255,255,255,.5); border-radius:6px; padding:8px;">
+          <div style="background:rgba(255,255,255,.65); backdrop-filter:blur(4px); border-radius:4px; padding:6px;">
+            <div style="background:var(--glass-dark); height:12px; border-radius:2px;"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Rule of Fifths -->
+    <p style="font-size:.8125rem; font-weight:600; margin-bottom:16px;">五分割法 — ヒーロー・キービジュアル配置</p>
+    <p style="font-size:.6875rem; color:var(--color-text-muted); margin-bottom:12px;">縦横を 5 等分した <strong>1/5 ライン</strong>（赤）と <strong>交点</strong>（黒丸）に主役を配置</p>
+    <div style="position:relative; aspect-ratio:16/9; background:var(--glass-warm); backdrop-filter:var(--glass-blur); border:1px solid var(--glass-border-w); box-shadow:var(--glass-hl), var(--glass-shadow); border-radius:var(--r-lg); overflow:hidden; margin-bottom:40px;">
+      <div style="position:absolute; top:0; bottom:0; left:20%; width:1px; background:rgba(198,41,44,.5);"></div>
+      <div style="position:absolute; top:0; bottom:0; left:40%; width:1px; background:rgba(198,41,44,.5);"></div>
+      <div style="position:absolute; top:0; bottom:0; left:60%; width:1px; background:rgba(198,41,44,.5);"></div>
+      <div style="position:absolute; top:0; bottom:0; left:80%; width:1px; background:rgba(198,41,44,.5);"></div>
+      <div style="position:absolute; left:0; right:0; top:20%; height:1px; background:rgba(198,41,44,.5);"></div>
+      <div style="position:absolute; left:0; right:0; top:40%; height:1px; background:rgba(198,41,44,.5);"></div>
+      <div style="position:absolute; left:0; right:0; top:60%; height:1px; background:rgba(198,41,44,.5);"></div>
+      <div style="position:absolute; left:0; right:0; top:80%; height:1px; background:rgba(198,41,44,.5);"></div>
+      <div style="position:absolute; left:20%; top:20%; width:10px; height:10px; background:var(--color-text); border-radius:50%; transform:translate(-50%,-50%);"></div>
+      <div style="position:absolute; left:80%; top:20%; width:10px; height:10px; background:var(--color-text); border-radius:50%; transform:translate(-50%,-50%);"></div>
+      <div style="position:absolute; left:20%; top:80%; width:10px; height:10px; background:var(--color-text); border-radius:50%; transform:translate(-50%,-50%);"></div>
+      <div style="position:absolute; left:80%; top:80%; width:10px; height:10px; background:var(--color-text); border-radius:50%; transform:translate(-50%,-50%);"></div>
+    </div>
+
+    <!-- Van de Graaf Canon -->
+    <p style="font-size:.8125rem; font-weight:600; margin-bottom:16px;">ヴァン・デ・グラーフ・カノン — プレゼン・章扉</p>
+    <p style="font-size:.6875rem; color:var(--color-text-muted); margin-bottom:12px;">A4 比率で上 1/9・外 1/9・下 2/9・内 2/9 の余白。Liquid 流に glass-panel を敷いた上で内側マージンを取る</p>
+    <div style="display:flex; gap:16px; align-items:flex-start; margin-bottom:8px;">
+      <div style="position:relative; aspect-ratio:1/1.414; width:180px; background:var(--glass-warm); backdrop-filter:var(--glass-blur-sm); border:1px solid var(--glass-border-w); box-shadow:var(--glass-hl), var(--glass-shadow-sm); border-radius:var(--r); padding:11.1% 22.2% 22.2% 11.1%; box-sizing:border-box;">
+        <div style="background:var(--glass-tinted); backdrop-filter:blur(4px); border:1px solid rgba(255,255,255,.45); border-radius:4px; height:100%; display:flex; flex-direction:column; gap:4px; padding:8px;">
+          <div style="background:var(--glass-dark); height:6px; border-radius:1px; width:80%;"></div>
+          <div style="background:rgba(53,54,45,.3); height:3px; border-radius:1px; width:100%;"></div>
+          <div style="background:rgba(53,54,45,.3); height:3px; border-radius:1px; width:90%;"></div>
+          <div style="background:rgba(53,54,45,.3); height:3px; border-radius:1px; width:60%;"></div>
+        </div>
+      </div>
+      <div style="flex:1; padding-top:8px;">
+        <div style="font-size:.75rem; color:var(--color-text-muted); line-height:1.7;">
+          ・top &nbsp;&nbsp;: 11.1%（1/9）<br>
+          ・left &nbsp;: 11.1%（1/9）<br>
+          ・right : 22.2%（2/9）<br>
+          ・bottom: 22.2%（2/9）<br>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- ═══ SPACING ═══ -->
+  <section class="section glass-panel">
+    <p class="section-title">Spacing Scale — 8px base</p>
+    <div>
+      <div class="spacing-row"><span class="spacing-label">4px</span><div class="spacing-box" style="width:4px;"></div></div>
+      <div class="spacing-row"><span class="spacing-label">8px</span><div class="spacing-box" style="width:8px;"></div></div>
+      <div class="spacing-row"><span class="spacing-label">12px</span><div class="spacing-box" style="width:12px;"></div></div>
+      <div class="spacing-row"><span class="spacing-label">16px</span><div class="spacing-box" style="width:16px;"></div></div>
+      <div class="spacing-row"><span class="spacing-label">24px</span><div class="spacing-box" style="width:24px;"></div></div>
+      <div class="spacing-row"><span class="spacing-label">32px</span><div class="spacing-box" style="width:32px;"></div></div>
+      <div class="spacing-row"><span class="spacing-label">48px</span><div class="spacing-box" style="width:48px;"></div></div>
+      <div class="spacing-row"><span class="spacing-label">64px</span><div class="spacing-box" style="width:64px;"></div></div>
+      <div class="spacing-row"><span class="spacing-label">96px</span><div class="spacing-box" style="width:96px;"></div></div>
+    </div>
+  </section>
+
+</div>
+
+<footer>
+  <span>instyle.group Design System — Liquid Glass Edition</span>
+  <span>2026-04-20</span>
+</footer>
+
+</body>
+</html>

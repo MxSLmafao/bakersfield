@@ -1,0 +1,133 @@
+/* ============================================================================
+   instyle.group Liquid Glass — component snippets
+   ----------------------------------------------------------------------------
+   Copy the blocks you need into your project. Tokens come from tokens.css.
+   ============================================================================ */
+
+/* ── Ambient scene background (REQUIRED) ──────────────
+   <div class="scene-bg"></div> as the FIRST child of <body>.
+   Without this, glass surfaces look flat and dead. */
+.scene-bg {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  background: var(--color-bg);
+  overflow: hidden;
+  pointer-events: none;
+}
+.scene-bg::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(ellipse 72% 65% at  8%  6%, rgba(196,193,176,.58) 0%, transparent 55%),
+    radial-gradient(ellipse 55% 55% at 94% 10%, rgba(230,226,215,.65) 0%, transparent 52%),
+    radial-gradient(ellipse 52% 68% at 78% 88%, rgba(196,193,176,.42) 0%, transparent 55%),
+    radial-gradient(ellipse 66% 46% at 18% 92%, rgba(230,226,215,.52) 0%, transparent 55%),
+    radial-gradient(ellipse 42% 42% at 50% 48%, rgba(243,241,238,.32) 0%, transparent 52%);
+}
+.page-header,
+.container,
+footer { position: relative; z-index: 1; }
+
+/* ── Glass panel (section wrapper) ─────────────────── */
+.glass-panel {
+  position: relative;
+  background: var(--glass-warm);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  border: 1px solid var(--glass-border-w);
+  box-shadow: var(--glass-hl), var(--glass-shadow);
+  border-radius: var(--r-xl);
+  padding: 36px;
+}
+.glass-panel::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  background: linear-gradient(180deg, rgba(255,255,255,.55), transparent 12%);
+}
+
+/* ── Card ──────────────────────────────────────────── */
+.card {
+  background: rgba(243,241,238,.56);
+  backdrop-filter: var(--glass-blur-sm);
+  -webkit-backdrop-filter: var(--glass-blur-sm);
+  border: 1px solid rgba(255,255,255,.72);
+  box-shadow: var(--glass-hl), var(--glass-shadow-sm);
+  border-radius: var(--r);
+  padding: 24px;
+}
+
+/* ── Button — primary (dark glass) ─────────────────── */
+.btn-primary {
+  background: var(--glass-dark);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  color: var(--color-text-inv);
+  border: 1px solid var(--glass-border-d);
+  border-radius: var(--r-pill);
+  padding: 10px 22px;
+  box-shadow: var(--glass-hl-d), 0 4px 16px rgba(53,54,45,.28);
+  transition: transform var(--ease-out), box-shadow var(--ease-out);
+}
+.btn-primary:hover {
+  transform: translateY(-1px);
+  box-shadow: var(--glass-hl-d), 0 8px 24px rgba(53,54,45,.34);
+}
+
+/* ── Button — secondary (warm glass) ───────────────── */
+.btn-secondary {
+  background: rgba(243,241,238,.65);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  color: var(--color-text);
+  border: 1px solid rgba(255,255,255,.78);
+  border-radius: var(--r-pill);
+  padding: 10px 22px;
+  box-shadow: var(--glass-hl), var(--glass-shadow-sm);
+  transition: transform var(--ease-out), box-shadow var(--ease-out);
+}
+
+/* ── Input ─────────────────────────────────────────── */
+input, textarea, select {
+  background: rgba(255,255,255,.55);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255,255,255,.78);
+  border-radius: var(--r-sm);
+  padding: 10px 16px;
+  color: var(--color-text);
+  font: inherit;
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.85),
+    0 2px 8px rgba(53,54,45,.06);
+}
+
+/* ── Inline text highlight (the only legitimate use of #E2DD2A) ── */
+mark, .mark {
+  background: linear-gradient(180deg, transparent 60%, var(--color-highlight) 60%);
+  padding: 0 2px;
+  color: inherit;
+}
+
+/* ── Eyebrow (tracked sans, the default editorial label) ── */
+.eyebrow {
+  font-family: var(--font-sans);
+  font-size: 0.625rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--color-text-muted);
+}
+
+/* ── Fallback for browsers without backdrop-filter ─── */
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .glass-panel { background: var(--color-surface); }
+  .card        { background: var(--color-surface); }
+  .btn-primary { background: var(--color-text); }
+  .btn-secondary { background: var(--color-surface-2); }
+  input, textarea, select { background: var(--color-surface); }
+}
