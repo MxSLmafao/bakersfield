@@ -1,7 +1,16 @@
-# Bakersfield — rebuild package
+# Bakersfield — handoff packages
 
-This folder holds everything that another AI model (or a person) needs to rebuild the
-Bakersfield website so that it matches the original.
+This folder holds two different packages. Choose one. Do not mix them.
+
+| Package | Where | The other model gets | The result |
+|---|---|---|---|
+| **From scratch** | `from-scratch/` | An empty repository, the same skills, tools, working method and client messages that the original model had. No code, no pictures, no prompts from the original. | A new site of the same kind. Its own design, code and pictures. |
+| **Exact copy** | This folder (files `00`–`10`, `reference/`, `scripts/`) | The finished source code, the saved pictures, and a full specification. | The same site. |
+
+- To let another model **do the project again itself**, go to `from-scratch/README.md`. Give the model only that folder.
+- To **reproduce the finished site**, read on.
+
+The rest of this file is about the exact-copy package.
 
 - **Start here:** give `00-MASTER-PROMPT.md` to the model.
 - **Ground truth for the code:** `reference/SOURCE.md` (every source file, complete).
