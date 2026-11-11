@@ -1,0 +1,333 @@
+.srOnly {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.section {
+  position: relative;
+  height: 100vh;
+  height: 100svh;
+  width: 100%;
+  overflow: hidden;
+  background: #efe2c8;
+  color: var(--ink, #462217);
+}
+
+.anchor {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 0;
+  height: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.stage {
+  position: relative;
+  height: 100%;
+  width: 100%;
+}
+
+/* Full-bleed footage. The canvas covers the stage and crops around the centre. */
+.media {
+  position: absolute;
+  inset: 0;
+  contain: layout paint;
+}
+
+.poster {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* ---------- Caption panel ---------- */
+.copy {
+  position: absolute;
+  left: clamp(20px, 4.5vw, 72px);
+  bottom: calc(clamp(24px, 6svh, 64px) + env(safe-area-inset-bottom));
+  width: min(400px, calc(100% - 40px));
+  padding: clamp(20px, 2.2vw, 30px) clamp(20px, 2.2vw, 30px) clamp(18px, 1.8vw, 24px);
+  border-radius: var(--r-lg, 24px);
+  border: 1px solid rgba(255, 255, 255, 0.7);
+  /* Own fill, so the 4.5:1 text contrast does not depend on a shared token. */
+  background: rgba(252, 244, 229, 0.88);
+  -webkit-backdrop-filter: var(--glass-blur, saturate(180%) blur(18px));
+  backdrop-filter: var(--glass-blur, saturate(180%) blur(18px));
+  box-shadow:
+    var(--glass-hl, inset 0 1px 0 rgba(255, 255, 255, 0.85)),
+    0 12px 40px rgba(70, 34, 23, 0.2);
+}
+
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .copy {
+    background: #fcf4e5;
+  }
+}
+
+/* All panels share one grid cell, so the box is as tall as the tallest copy. */
+.panels {
+  display: grid;
+}
+
+.panel {
+  grid-area: 1 / 1;
+  align-self: start;
+  visibility: hidden;
+  opacity: 0;
+}
+
+/* Before script runs, the first panel is visible. Script then takes over with inline styles. */
+.panel:first-child {
+  visibility: visible;
+  opacity: 1;
+}
+
+.num {
+  margin: 0 0 10px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  font-variant-numeric: tabular-nums;
+  color: #8a4522;
+}
+
+.title {
+  margin: 0 0 10px;
+  font-family: var(--font-body, system-ui, sans-serif);
+  font-size: clamp(1.75rem, 1.25rem + 1.5vw, 2.625rem);
+  font-weight: 600;
+  line-height: 1.04;
+  letter-spacing: -0.035em;
+  text-wrap: balance;
+  color: var(--ink, #462217);
+}
+
+.body {
+  margin: 0;
+  max-width: 34ch;
+  font-size: clamp(1rem, 0.95rem + 0.2vw, 1.0625rem);
+  line-height: 1.5;
+  color: var(--ink, #462217);
+  text-wrap: pretty;
+}
+
+/* ---------- Progress ---------- */
+.bar {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 6px;
+  margin-top: 20px;
+}
+
+.cell {
+  height: 3px;
+  border-radius: 2px;
+  background: rgba(70, 34, 23, 0.2);
+  transition: background-color 0.4s var(--ease-out, cubic-bezier(0.22, 1, 0.36, 1));
+}
+
+.cell[data-state='past'] {
+  background: rgba(70, 34, 23, 0.6);
+}
+
+.cell[data-state='current'] {
+  background: var(--bake, #d06c2e);
+}
+
+/* ---------- Side rail ---------- */
+.rail {
+  position: absolute;
+  right: clamp(12px, 2vw, 28px);
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  flex-direction: column;
+  padding: 6px 0;
+  border-radius: var(--r-pill, 999px);
+  border: 1px solid rgba(255, 255, 255, 0.6);
+  background: var(--glass-light, rgba(255, 250, 240, 0.5));
+  -webkit-backdrop-filter: var(--glass-blur, saturate(180%) blur(18px));
+  backdrop-filter: var(--glass-blur, saturate(180%) blur(18px));
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.85),
+    0 4px 18px rgba(70, 34, 23, 0.14);
+}
+
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .rail {
+    background: #fbf1dd;
+  }
+}
+
+.railButton {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: none;
+  cursor: pointer;
+}
+
+.railButton:focus-visible {
+  outline: 3px solid var(--bake, #d06c2e);
+  outline-offset: -3px;
+}
+
+.railDot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: rgba(70, 34, 23, 0.4);
+  transition:
+    transform 0.4s var(--ease-out, cubic-bezier(0.22, 1, 0.36, 1)),
+    background-color 0.4s var(--ease-out, cubic-bezier(0.22, 1, 0.36, 1));
+}
+
+.railDot[data-active='true'] {
+  background: var(--bake, #d06c2e);
+  transform: scale(1.5);
+}
+
+@media (hover: hover) {
+  .railButton:hover .railDot {
+    background: var(--crust, #a8572d);
+  }
+}
+
+/* ---------- Portrait: frame on top, copy on a cream surface below ---------- */
+@media (orientation: portrait) {
+  .stage {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    gap: clamp(20px, 4svh, 40px);
+    padding: calc(env(safe-area-inset-top) + clamp(24px, 9svh, 80px)) 0 env(safe-area-inset-bottom);
+    background: linear-gradient(to bottom, #f1e4ca, #f8eed8);
+  }
+
+  .media {
+    position: relative;
+    inset: auto;
+    flex: none;
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    /* Soft top and bottom edge, so the frame melts into the cream surface. */
+    -webkit-mask-image: linear-gradient(to bottom, transparent, #000 9%, #000 91%, transparent);
+    mask-image: linear-gradient(to bottom, transparent, #000 9%, #000 91%, transparent);
+  }
+
+  .copy {
+    position: static;
+    width: 100%;
+    max-width: 520px;
+    margin: 0 auto;
+    padding: 0 max(24px, env(safe-area-inset-left)) 0 max(24px, env(safe-area-inset-right));
+    border: 0;
+    border-radius: 0;
+    background: none;
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+    box-shadow: none;
+  }
+
+  .title {
+    font-size: clamp(1.875rem, 1.2rem + 3.4vw, 2.5rem);
+  }
+
+  .rail {
+    display: none;
+  }
+}
+
+/* ---------- Short landscape (phones on their side) ---------- */
+@media (orientation: landscape) and (max-height: 500px) {
+  .copy {
+    left: max(16px, env(safe-area-inset-left));
+    bottom: max(14px, env(safe-area-inset-bottom));
+    width: min(264px, 40vw);
+    padding: 12px 14px 10px;
+    border-radius: 18px;
+  }
+
+  .num {
+    margin-bottom: 6px;
+    font-size: 0.6875rem;
+  }
+
+  .title {
+    margin-bottom: 6px;
+    font-size: 1.5rem;
+  }
+
+  .body {
+    font-size: 0.9375rem;
+    line-height: 1.4;
+  }
+
+  .bar {
+    margin-top: 12px;
+  }
+
+  .rail {
+    display: none;
+  }
+}
+
+/* ---------- Reduced motion: a plain list of stills ---------- */
+.list {
+  padding: clamp(40px, 8vw, 120px) max(20px, env(safe-area-inset-left)) clamp(40px, 8vw, 120px)
+    max(20px, env(safe-area-inset-right));
+  background: linear-gradient(to bottom, #f6e7ca, #f8eed8);
+  color: var(--ink, #462217);
+}
+
+.listInner {
+  display: grid;
+  gap: clamp(48px, 8vw, 112px);
+  max-width: 1120px;
+  margin: 0 auto;
+  padding: 0;
+  list-style: none;
+}
+
+.item {
+  display: grid;
+  gap: clamp(20px, 3vw, 40px);
+  align-items: center;
+  scroll-margin-top: 24px;
+}
+
+@media (min-width: 900px) {
+  .item {
+    grid-template-columns: minmax(0, 1.6fr) minmax(0, 1fr);
+  }
+}
+
+.still {
+  display: block;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 16 / 9;
+  object-fit: cover;
+  border-radius: var(--r-lg, 24px);
+  box-shadow: 0 12px 40px rgba(70, 34, 23, 0.16);
+}
+
+.card {
+  max-width: 420px;
+}
