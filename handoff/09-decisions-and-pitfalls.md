@@ -77,6 +77,8 @@ errors. Each row is something that was decided, or something that went wrong and
 - On portrait phones, the POV frame moves about 12 px when the caption height changes between beats.
 - The call-to-action links go to `#`.
 - `npm audit` reported 8 issues in dependencies (7 moderate, 1 high) at scaffold time. They were not fixed.
+- The first-frame preload on `/` does not match the chosen frame set in three cases, and the browser then logs "preloaded but not used": a short landscape phone (for example 844x390), a data-saver or slow connection on a wide screen, and reduced-motion mode (which loads no frames). The preload uses a width query only; the frame loader uses `wantsSmallFrames()`.
+- More small quirks, found when the code was documented, are listed at the end of `04-architecture.md` and `05-design-and-motion.md` under "Known quirks". A rebuild must keep them to stay identical.
 
 ## 4. Working method that produced the site
 
