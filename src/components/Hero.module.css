@@ -1,0 +1,119 @@
+.hero {
+  position: relative;
+  min-height: 100vh;
+  min-height: 100svh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 72px var(--gutter) 96px;
+  text-align: center;
+  overflow: hidden;
+}
+
+.inner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: clamp(12px, 2vh, 24px);
+  animation: rise 900ms var(--ease-out) both;
+}
+
+.mark {
+  width: clamp(160px, 28vw, 300px);
+  aspect-ratio: 1;
+  padding: var(--pixel);
+  background: var(--butter);
+  border: var(--pixel) solid var(--ink);
+  box-shadow: var(--pixel-shadow);
+  animation: bob 4s ease-in-out 900ms infinite;
+}
+
+.logo {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  image-rendering: pixelated;
+}
+
+.wordmark {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: var(--text-display);
+  line-height: 0.95;
+  letter-spacing: 0.01em;
+  color: var(--ink);
+  text-shadow: 4px 4px 0 var(--honey);
+}
+
+.tagline {
+  max-width: 28ch;
+  font-size: clamp(1.125rem, 1rem + 0.5vw, 1.375rem);
+  color: var(--ink);
+}
+
+.scroll {
+  position: absolute;
+  bottom: 16px;
+  left: 50%;
+  transform: translateX(-50%);
+  min-width: var(--touch);
+  min-height: var(--touch);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  color: var(--ink);
+  text-decoration: none;
+  font-weight: 700;
+  font-size: var(--text-label);
+}
+
+.arrow {
+  width: 12px;
+  height: 12px;
+  border-right: 4px solid var(--ink);
+  border-bottom: 4px solid var(--ink);
+  transform: rotate(45deg);
+  animation: nudge 1.6s ease-in-out infinite;
+}
+
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(24px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes bob {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-6px);
+  }
+}
+
+@keyframes nudge {
+  0%,
+  100% {
+    transform: translateY(0) rotate(45deg);
+  }
+  50% {
+    transform: translateY(6px) rotate(45deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .inner,
+  .mark,
+  .arrow {
+    animation: none;
+  }
+}

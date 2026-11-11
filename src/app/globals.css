@@ -1,0 +1,146 @@
+/* Design tokens. Colours come from the logo pixels (see assets/brand/BRAND.md). */
+:root {
+  --cream: #f6e7ca;
+  --butter: #fad488;
+  --honey: #f9b35f;
+  --amber: #ea9346;
+  --bake: #d06c2e;
+  --crust: #a8572d;
+  --ink: #462217;
+
+  --bg: var(--cream);
+  --fg: var(--ink);
+  --surface: var(--butter);
+  --accent: var(--bake);
+  --accent-strong: var(--crust);
+  --focus: var(--crust);
+
+  --font-display: 'Pixelify Sans', ui-monospace, monospace;
+  --font-body: 'DM Sans Variable', system-ui, -apple-system, 'Segoe UI', sans-serif;
+
+  /* Fluid type scale */
+  --text-body: clamp(1rem, 0.95rem + 0.25vw, 1.125rem);
+  --text-label: clamp(1rem, 0.96rem + 0.2vw, 1.0625rem);
+  --text-title: clamp(2.25rem, 1.2rem + 4.5vw, 5.5rem);
+  --text-display: clamp(3.5rem, 1.5rem + 9vw, 11rem);
+  --text-num: clamp(2.5rem, 1rem + 5vw, 6rem);
+
+  /* Pixel frame */
+  --pixel: 4px;
+  --pixel-shadow: 4px 4px 0 var(--ink);
+
+  --gutter: 16px;
+  --touch: 44px;
+  --radius: 0;
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) {
+    /* The brand is a light, warm site. Keep the same palette in dark mode. */
+    --bg: var(--cream);
+    --fg: var(--ink);
+  }
+}
+
+:root[data-theme='dark'] {
+  --bg: var(--cream);
+  --fg: var(--ink);
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+
+html.lenis,
+html.lenis body {
+  height: auto;
+}
+
+.lenis.lenis-smooth {
+  scroll-behavior: auto !important;
+}
+
+.lenis.lenis-stopped {
+  overflow: hidden;
+}
+
+body {
+  margin: 0;
+  background-color: var(--bg);
+  color: var(--fg);
+  font-family: var(--font-body);
+  font-size: var(--text-body);
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+  overflow-x: clip;
+}
+
+img,
+canvas {
+  display: block;
+  max-width: 100%;
+}
+
+[hidden] {
+  display: none !important;
+}
+
+h1,
+h2,
+h3,
+p {
+  margin: 0;
+}
+
+:focus-visible {
+  outline: 3px solid var(--focus);
+  outline-offset: 3px;
+}
+
+.skip-link {
+  position: absolute;
+  top: var(--gutter);
+  left: var(--gutter);
+  z-index: 100;
+  min-height: var(--touch);
+  display: inline-flex;
+  align-items: center;
+  padding: 0 20px;
+  background: var(--butter);
+  color: var(--ink);
+  border: var(--pixel) solid var(--ink);
+  box-shadow: var(--pixel-shadow);
+  font-weight: 700;
+  transform: translateY(-200%);
+}
+
+.skip-link:focus {
+  transform: translateY(0);
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+}

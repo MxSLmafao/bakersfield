@@ -1,0 +1,84 @@
+.visit {
+  min-height: 100vh;
+  min-height: 100svh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 80px var(--gutter);
+  background: var(--butter);
+}
+
+.card {
+  width: min(560px, 100%);
+  padding: clamp(24px, 4vw, 48px);
+  background: var(--cream);
+  border: var(--pixel) solid var(--ink);
+  box-shadow: 8px 8px 0 var(--ink);
+  text-align: left;
+}
+
+.num {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: clamp(2rem, 1.2rem + 2vw, 3.25rem);
+  line-height: 1;
+  color: var(--accent-strong);
+}
+
+.title {
+  margin-top: 12px;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: clamp(2rem, 1.3rem + 3vw, 4rem);
+  line-height: 1.05;
+  color: var(--ink);
+}
+
+.body {
+  margin-top: 16px;
+  max-width: 36ch;
+  color: var(--ink);
+}
+
+.button {
+  margin-top: 28px;
+  min-height: var(--touch);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 12px 28px;
+  background: var(--honey);
+  color: var(--ink);
+  border: var(--pixel) solid var(--ink);
+  box-shadow: var(--pixel-shadow);
+  font-family: var(--font-body);
+  font-weight: 700;
+  font-size: var(--text-label);
+  text-decoration: none;
+  transition:
+    transform 120ms var(--ease-out),
+    box-shadow 120ms var(--ease-out),
+    background-color 120ms var(--ease-out);
+}
+
+.button:hover {
+  transform: translate(0, -2px);
+  box-shadow: 4px 6px 0 var(--ink);
+  background: var(--amber);
+}
+
+.button:active {
+  transform: translate(4px, 4px);
+  box-shadow: 0 0 0 var(--ink);
+}
+
+.button:focus-visible {
+  outline: 3px solid var(--ink);
+  outline-offset: 4px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .button {
+    transition: none;
+  }
+}
