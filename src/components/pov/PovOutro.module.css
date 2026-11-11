@@ -17,17 +17,18 @@
   position: absolute;
   inset: 0;
   z-index: -1;
-  /* Faint marble, washed with cream. It also gives the glass button something to blur. */
+  /* Faint marble, washed with cream. It also gives the glass button something to blur.
+     The ?v= query must match ASSET_VERSION in src/lib/asset-version.ts. */
   background:
     linear-gradient(to bottom, rgba(248, 238, 216, 0.9), rgba(246, 231, 202, 0.82)),
-    url('/pov/ingredients/0001.webp') center / cover no-repeat;
+    url('/pov/ingredients/0001.webp?v=2') center / cover no-repeat;
 }
 
 @media (max-width: 767px), (max-width: 932px) and (max-height: 500px) {
   .outro::before {
     background:
       linear-gradient(to bottom, rgba(248, 238, 216, 0.9), rgba(246, 231, 202, 0.82)),
-      url('/pov-sm/ingredients/0001.webp') center / cover no-repeat;
+      url('/pov-sm/ingredients/0001.webp?v=2') center / cover no-repeat;
   }
 }
 

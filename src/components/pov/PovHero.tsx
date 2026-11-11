@@ -1,4 +1,5 @@
 import { povHero, povSequenceBeats } from '@/content/pov';
+import { withVersion } from '@/lib/asset-version';
 import { PHONE_QUERY } from '@/lib/device';
 import styles from './PovHero.module.css';
 
@@ -11,10 +12,10 @@ export function PovHero() {
   return (
     <section className={styles.hero} aria-labelledby="pov-hero-title">
       <picture>
-        <source media={PHONE_QUERY} srcSet={povHero.imageSm} />
+        <source media={PHONE_QUERY} srcSet={withVersion(povHero.imageSm)} />
         <img
           className={styles.image}
-          src={povHero.image}
+          src={withVersion(povHero.image)}
           alt=""
           width={960}
           height={540}
@@ -29,7 +30,7 @@ export function PovHero() {
         <img
           className={`${styles.logo} ${styles.rise}`}
           style={{ '--d': '0ms' } as React.CSSProperties}
-          src="/brand/logo-mark.jpg"
+          src={withVersion('/brand/logo-mark.webp')}
           alt=""
           width={56}
           height={56}

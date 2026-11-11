@@ -1,4 +1,3 @@
-import Link from 'next/link';
 import { povOutro } from '@/content/pov';
 import styles from './PovOutro.module.css';
 
@@ -17,9 +16,11 @@ export function PovOutro() {
           <a className={styles.cta} href="#">
             {povOutro.cta}
           </a>
-          <Link className={styles.secondary} href="/">
+          {/* A plain link: Next prefetching "/" here would put the home page's frame preload on this page. */}
+          {/* eslint-disable-next-line @next/next/no-html-link-for-pages */}
+          <a className={styles.secondary} href="/">
             {povOutro.secondary}
-          </Link>
+          </a>
         </div>
       </div>
       <p className={styles.footer}>&copy; Bakersfield {year}</p>

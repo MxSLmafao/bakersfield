@@ -5,6 +5,7 @@ import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { PovSequence, type PovSequenceHandle } from './PovSequence';
 import { POV_BEAT_TOTAL, POV_CUT_SEGMENTS, POV_STORY_ALT, povSequenceBeats } from '@/content/pov';
+import { withVersion } from '@/lib/asset-version';
 import { PHONE_QUERY, isCoarsePointer, isPhone, stableViewportHeight, wantsSmallFrames } from '@/lib/device';
 import { registerPovY, scrollToPovBeat, setPovState, usePovState } from '@/lib/pov-store';
 import { segmentAt } from '@/lib/segments';
@@ -23,8 +24,8 @@ const FADE_SPAN = 0.08;
 const SEGMENTS = povSequenceBeats.length;
 const FRAME_SETS = povSequenceBeats.map((beat) => beat.frames);
 const SMALL_FRAME_SETS = povSequenceBeats.map((beat) => beat.framesSm);
-const POSTER = povSequenceBeats[0].poster;
-const POSTER_SM = povSequenceBeats[0].posterSm;
+const POSTER = withVersion(povSequenceBeats[0].poster);
+const POSTER_SM = withVersion(povSequenceBeats[0].posterSm);
 const HASH_PREFIX = '#pov-';
 
 const pad2 = (n: number) => String(n).padStart(2, '0');
@@ -210,8 +211,8 @@ export function PovStory() {
           {povSequenceBeats.map((beat) => (
             <li key={beat.id} id={`pov-${beat.slug}`} className={styles.item}>
               <picture>
-                <source media={PHONE_QUERY} srcSet={beat.posterSm} />
-                <img className={styles.still} src={beat.poster} width={960} height={540} loading="lazy" alt="" />
+                <source media={PHONE_QUERY} srcSet={withVersion(beat.posterSm)} />
+                <img className={styles.still} src={withVersion(beat.poster)} width={960} height={540} loading="lazy" alt="" />
               </picture>
               <div className={styles.card}>
                 <p className={styles.num} aria-hidden="true">

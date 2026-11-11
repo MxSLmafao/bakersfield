@@ -2,6 +2,7 @@
 
 import { useEffect, useImperativeHandle, useRef, useState, type Ref } from 'react';
 import type { FrameSet } from '@/content/beats';
+import { withVersion } from '@/lib/asset-version';
 import { localAt, segmentAt } from '@/lib/segments';
 import styles from './ScrollSequence.module.css';
 
@@ -23,7 +24,7 @@ export type ScrollSequenceProps = {
   ref?: Ref<ScrollSequenceHandle>;
 };
 
-const LOGO_SRC = '/brand/logo-mark.jpg';
+const LOGO_SRC = withVersion('/brand/logo-mark.webp');
 const MAX_DPR = 2;
 /** Start loading when the stage is within 1.5 viewports of the screen. */
 const LOAD_MARGIN = '150% 0px 150% 0px';
@@ -95,7 +96,7 @@ export function ScrollSequence({
     for (const set of segments) {
       offsets.push(urls.length);
       for (let i = 0; i < set.count; i++) {
-        urls.push(`${set.dir}/${pad(i + 1)}.${set.ext}`);
+        urls.push(withVersion(`${set.dir}/${pad(i + 1)}.${set.ext}`));
       }
     }
     const total = urls.length;

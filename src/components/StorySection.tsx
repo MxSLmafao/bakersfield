@@ -5,6 +5,7 @@ import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { ScrollSequence, type ScrollSequenceHandle } from './ScrollSequence';
 import { sequenceBeats } from '@/content/beats';
+import { withVersion } from '@/lib/asset-version';
 import { setBeatState, useBeatState } from '@/lib/beat-store';
 import { PHONE_QUERY, isCoarsePointer, isPhone, stableViewportHeight, wantsSmallFrames } from '@/lib/device';
 import { registerBeatY } from '@/lib/scroll';
@@ -23,8 +24,8 @@ const VH_PER_BEAT_PHONE = 0.85;
 const SEGMENTS = sequenceBeats.length;
 const FRAME_SETS = sequenceBeats.map((beat) => beat.frames);
 const SMALL_FRAME_SETS = sequenceBeats.map((beat) => beat.framesSm);
-const STORY_POSTER = sequenceBeats[0].poster;
-const STORY_POSTER_SM = sequenceBeats[0].posterSm;
+const STORY_POSTER = withVersion(sequenceBeats[0].poster);
+const STORY_POSTER_SM = withVersion(sequenceBeats[0].posterSm);
 const STORY_ALT = 'A croissant being made, from simple ingredients to a golden bake.';
 
 const pad2 = (n: number) => String(n).padStart(2, '0');
@@ -226,10 +227,10 @@ export function StorySection() {
             {sequenceBeats.map((beat) => (
               <li key={beat.id} id={`beat-${beat.slug}`} className={styles.item}>
                 <picture className={styles.picture}>
-                  <source media={PHONE_QUERY} srcSet={beat.posterSm} />
+                  <source media={PHONE_QUERY} srcSet={withVersion(beat.posterSm)} />
                   <img
                     className={styles.still}
-                    src={beat.poster}
+                    src={withVersion(beat.poster)}
                     width={720}
                     height={720}
                     loading="lazy"
