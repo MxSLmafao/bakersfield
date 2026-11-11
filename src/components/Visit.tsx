@@ -1,3 +1,4 @@
+import Link from 'next/link';
 import type { Beat } from '@/content/beats';
 import { RevealOnView } from './RevealOnView';
 import styles from './Visit.module.css';
@@ -22,6 +23,9 @@ export function Visit({ beat }: { beat: Beat }) {
           <a className={styles.button} href="#">
             Come say bonjour
           </a>
+          <Link className={styles.secondaryLink} href="/pov">
+            See the baker&apos;s view
+          </Link>
         </div>
       </RevealOnView>
       <p className={styles.foot}>© Bakersfield {YEAR}</p>

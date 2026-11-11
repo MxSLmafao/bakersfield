@@ -63,19 +63,23 @@
   color: var(--ink);
 }
 
-/* The button arrives a beat after the card. */
+/* The button arrives a beat after the card. Hidden only when the card is armed by script,
+   so the button shows without JavaScript. The transition belongs to the shown state. */
 .actions {
   margin-top: 32px;
+}
+
+.card[data-armed='true'] .actions {
   opacity: 0;
   transform: translateY(12px);
-  transition:
-    opacity 520ms var(--ease-out) 180ms,
-    transform 620ms var(--ease-spring) 180ms;
 }
 
 .card[data-shown='true'] .actions {
   opacity: 1;
   transform: none;
+  transition:
+    opacity 520ms var(--ease-out) 180ms,
+    transform 620ms var(--ease-spring) 180ms;
 }
 
 /* Primary control: dark warm glass pill. */
@@ -117,6 +121,36 @@
   border-radius: inherit;
   pointer-events: none;
   background: linear-gradient(180deg, rgba(255, 240, 220, 0.14), rgba(255, 240, 220, 0) 55%);
+}
+
+/* Quiet secondary link under the button. Same style as the pixel-version link on /pov. */
+.secondaryLink {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  margin-top: 8px;
+  padding: 0 8px;
+  color: var(--ink);
+  font-family: var(--font-body);
+  font-size: var(--text-label);
+  font-weight: 500;
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 5px;
+  text-decoration-color: rgba(70, 34, 23, 0.4);
+  transition: text-decoration-color 0.25s;
+}
+
+@media (hover: hover) {
+  .secondaryLink:hover {
+    text-decoration-color: currentColor;
+  }
+}
+
+.secondaryLink:focus-visible {
+  outline: 3px solid var(--bake);
+  outline-offset: 3px;
+  border-radius: 6px;
 }
 
 /* Moving sheen. Parked off to the left until hover. */
@@ -194,6 +228,12 @@
     min-height: 52px;
   }
 
+  .secondaryLink {
+    display: flex;
+    justify-content: center;
+    width: 100%;
+  }
+
   /* No moving sheen on phones. */
   .button::after {
     display: none;
@@ -205,7 +245,7 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .actions {
+  .card[data-shown='true'] .actions {
     transform: none;
     transition: opacity 240ms linear;
   }

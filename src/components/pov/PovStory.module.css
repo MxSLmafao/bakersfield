@@ -211,12 +211,18 @@
 
 /* ---------- Portrait: frame on top, copy on a cream surface below ---------- */
 @media (orientation: portrait) {
+  /* The bottom padding is 8svh larger than the top. The auto margins below then
+     centre the frame and copy at about 46% of the height. If the group is taller
+     than the stage, the auto margins drop to 0 and it sits top-aligned. */
   .stage {
     display: flex;
     flex-direction: column;
     justify-content: flex-start;
     gap: clamp(20px, 4svh, 40px);
-    padding: calc(env(safe-area-inset-top) + clamp(24px, 9svh, 80px)) 0 env(safe-area-inset-bottom);
+    padding:
+      calc(env(safe-area-inset-top) + clamp(24px, 4svh, 40px))
+      0
+      calc(env(safe-area-inset-bottom) + clamp(24px, 4svh, 40px) + 8svh);
     background: linear-gradient(to bottom, #f1e4ca, #f8eed8);
   }
 
@@ -225,6 +231,7 @@
     inset: auto;
     flex: none;
     width: 100%;
+    margin-top: auto;
     aspect-ratio: 16 / 9;
     /* Soft top and bottom edge, so the frame melts into the cream surface. */
     -webkit-mask-image: linear-gradient(to bottom, transparent, #000 9%, #000 91%, transparent);
@@ -235,7 +242,7 @@
     position: static;
     width: 100%;
     max-width: 520px;
-    margin: 0 auto;
+    margin: 0 auto auto;
     padding: 0 max(24px, env(safe-area-inset-left)) 0 max(24px, env(safe-area-inset-right));
     border: 0;
     border-radius: 0;

@@ -1,20 +1,22 @@
-/* Rises and fades in once, when first in view. Driven by data-shown. */
-.reveal {
+/* Visible by default, so the content shows without JavaScript.
+   The script sets data-armed only for content below the fold (see RevealOnView.tsx).
+   Hiding is instant. The transition belongs to the revealed state, so arming
+   causes no fade-out flash. */
+.reveal[data-armed='true'] {
   opacity: 0;
   transform: translateY(24px);
+}
+
+.reveal[data-armed='true'][data-shown='true'] {
+  opacity: 1;
+  transform: none;
   transition:
     opacity 600ms var(--ease-out),
     transform 760ms var(--ease-spring);
 }
 
-.reveal[data-shown='true'] {
-  opacity: 1;
-  transform: none;
-}
-
 @media (prefers-reduced-motion: reduce) {
-  .reveal,
-  .reveal[data-shown='true'] {
+  .reveal[data-armed='true'][data-shown='true'] {
     transform: none;
     transition: opacity 240ms linear;
   }
