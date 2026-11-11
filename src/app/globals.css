@@ -1,6 +1,11 @@
 /* Design tokens. Colours come from the logo pixels (see assets/brand/BRAND.md). */
 :root {
+  /* The brand is a light, warm site. Only the light scheme is used. */
+  color-scheme: light;
+
   --cream: #f6e7ca;
+  /* Background of the story stage. Matches the frame background. */
+  --stage: #f7e3b8;
   --butter: #fad488;
   --honey: #f9b35f;
   --amber: #ea9346;
@@ -33,19 +38,6 @@
   --touch: 44px;
   --radius: 0;
   --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root:not([data-theme='light']) {
-    /* The brand is a light, warm site. Keep the same palette in dark mode. */
-    --bg: var(--cream);
-    --fg: var(--ink);
-  }
-}
-
-:root[data-theme='dark'] {
-  --bg: var(--cream);
-  --fg: var(--ink);
 }
 
 *,
@@ -143,4 +135,9 @@ p {
   html {
     scroll-behavior: auto;
   }
+}
+
+/* Pixelify Sans draws its "fi" ligature like an "A". Keep letters separate. */
+:root {
+  font-variant-ligatures: no-common-ligatures;
 }

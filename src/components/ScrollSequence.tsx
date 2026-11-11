@@ -1,20 +1,19 @@
 'use client';
 
 import { useEffect, useImperativeHandle, useRef, useState, type Ref } from 'react';
+import type { FrameSet } from '@/content/beats';
+import { localAt, segmentAt } from '@/lib/segments';
 import styles from './ScrollSequence.module.css';
 
 export type ScrollSequenceHandle = {
-  /** Set scroll progress of the pinned section, 0 to 1. Cheap: no React state. */
+  /** Set the global progress of the story, 0 to 1. Cheap: no React state. */
   setProgress: (progress: number) => void;
 };
 
 export type ScrollSequenceProps = {
-  /** Public folder with the frames, e.g. /frames/dough */
-  dir: string;
-  /** Number of frames. 0 means not delivered yet: show the poster or fallback. */
-  count: number;
-  ext: 'webp' | 'jpg';
-  /** Still image shown until frames are ready. */
+  /** Frame sets that play one after the other, as one flat list. */
+  segments: readonly FrameSet[];
+  /** Still image shown until the first frame is ready. */
   poster: string;
   alt: string;
   ref?: Ref<ScrollSequenceHandle>;
@@ -28,15 +27,16 @@ const pad = (n: number) => String(n).padStart(4, '0');
 const clamp01 = (n: number) => (n < 0 ? 0 : n > 1 ? 1 : n);
 
 /**
- * Draws one frame of an image sequence into a canvas, chosen by scroll progress.
- * The parent BeatSection pins the section and calls `setProgress` through the ref.
+ * Draws one frame of a flat list of image sequences into a canvas.
+ * Global progress picks the segment, and local progress picks the frame.
+ * The frame is fitted with "contain", so the whole square is always visible.
+ * The parent StorySection pins the section and calls `setProgress` through the ref.
  */
-export function ScrollSequence({ dir, count, ext, poster, alt, ref }: ScrollSequenceProps) {
+export function ScrollSequence({ segments, poster, alt, ref }: ScrollSequenceProps) {
   const stageRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const engineRef = useRef<{ setProgress: (p: number) => void } | null>(null);
+  const engineRef = useRef<ScrollSequenceHandle | null>(null);
 
-  const [reduced, setReduced] = useState(false);
   const [frameMode, setFrameMode] = useState(false);
   const [posterState, setPosterState] = useState<'pending' | 'ok' | 'failed'>('pending');
 
@@ -61,36 +61,39 @@ export function ScrollSequence({ dir, count, ext, poster, alt, ref }: ScrollSequ
     };
   }, [poster]);
 
-  // Reduced motion: no scrubbing, show the poster or fallback only.
-  useEffect(() => {
-    const mq = window.matchMedia('(prefers-reduced-motion: reduce)');
-    const update = () => setReduced(mq.matches);
-    update();
-    mq.addEventListener('change', update);
-    return () => mq.removeEventListener('change', update);
-  }, []);
-
   useEffect(() => {
     const stage = stageRef.current;
     const canvas = canvasRef.current;
-    if (reduced || count <= 0 || !stage || !canvas) {
-      engineRef.current = null;
-      return;
-    }
+    if (!stage || !canvas) return;
     const ctx = canvas.getContext('2d');
-    if (!ctx) {
-      engineRef.current = null;
-      return;
+    if (!ctx) return;
+
+    // Flat frame list: segment offsets and the URL of every frame.
+    const offsets: number[] = [];
+    const urls: string[] = [];
+    for (const set of segments) {
+      offsets.push(urls.length);
+      for (let i = 0; i < set.count; i++) {
+        urls.push(`${set.dir}/${pad(i + 1)}.${set.ext}`);
+      }
     }
+    const total = urls.length;
+    if (total === 0) return;
+    const segmentCount = segments.length;
+
+    const frameIndexFor = (p: number) => {
+      const seg = segmentAt(p, segmentCount);
+      const count = segments[seg].count;
+      const local = localAt(p, segmentCount, seg);
+      return offsets[seg] + Math.max(0, Math.round(local * (count - 1)));
+    };
 
     let cancelled = false;
     let rafId = 0;
     let progress = 0;
     let lastTarget = -1;
     let drawn = -1;
-    const frames: (HTMLImageElement | null)[] = new Array(count).fill(null);
-
-    const indexFor = (p: number) => Math.round(clamp01(p) * (count - 1));
+    const frames: (HTMLImageElement | null)[] = new Array(total).fill(null);
 
     const sizeCanvas = () => {
       const rect = stage.getBoundingClientRect();
@@ -98,12 +101,11 @@ export function ScrollSequence({ dir, count, ext, poster, alt, ref }: ScrollSequ
       canvas.width = Math.max(1, Math.round(rect.width * dpr));
       canvas.height = Math.max(1, Math.round(rect.height * dpr));
       // Resizing the canvas resets its context state.
-      ctx.imageSmoothingEnabled = false;
       drawn = -1;
     };
 
     const draw = () => {
-      const target = indexFor(progress);
+      const target = frameIndexFor(progress);
       // Use the wanted frame, or the nearest loaded one while it loads.
       let src = -1;
       for (let i = target; i >= 0; i--) {
@@ -113,7 +115,7 @@ export function ScrollSequence({ dir, count, ext, poster, alt, ref }: ScrollSequ
         }
       }
       if (src === -1) {
-        for (let i = target + 1; i < count; i++) {
+        for (let i = target + 1; i < total; i++) {
           if (frames[i]) {
             src = i;
             break;
@@ -128,11 +130,12 @@ export function ScrollSequence({ dir, count, ext, poster, alt, ref }: ScrollSequ
       const ch = canvas.height;
       const iw = img.naturalWidth;
       const ih = img.naturalHeight;
-      // object-fit: cover maths
-      const scale = Math.max(cw / iw, ch / ih);
+      // object-fit: contain maths
+      const scale = Math.min(cw / iw, ch / ih);
       const dw = iw * scale;
       const dh = ih * scale;
-      ctx.imageSmoothingEnabled = false;
+      ctx.imageSmoothingEnabled = true;
+      ctx.imageSmoothingQuality = 'high';
       ctx.clearRect(0, 0, cw, ch);
       ctx.drawImage(img, (cw - dw) / 2, (ch - dh) / 2, dw, dh);
       drawn = src;
@@ -148,7 +151,7 @@ export function ScrollSequence({ dir, count, ext, poster, alt, ref }: ScrollSequ
 
     const setProgress = (p: number) => {
       progress = clamp01(p);
-      const target = indexFor(progress);
+      const target = frameIndexFor(progress);
       if (target === lastTarget) return;
       lastTarget = target;
       schedule();
@@ -169,15 +172,15 @@ export function ScrollSequence({ dir, count, ext, poster, alt, ref }: ScrollSequ
         img.decoding = 'async';
         img.onload = () => resolve(img);
         img.onerror = () => resolve(null);
-        img.src = `${dir}/${pad(i + 1)}.${ext}`;
+        img.src = urls[i];
       });
 
-    // Preload: frame 1 first, so something shows at once. Then the rest in a small pool.
+    // Preload in story order: frame 1 first, then the rest in a small pool.
     const run = async () => {
       const first = await loadFrame(0);
       if (cancelled) return;
       if (!first) {
-        // Frame 1 failed: keep the poster or fallback on screen.
+        // First frame failed: keep the poster on screen.
         return;
       }
       frames[0] = first;
@@ -187,7 +190,7 @@ export function ScrollSequence({ dir, count, ext, poster, alt, ref }: ScrollSequ
 
       let next = 1;
       const worker = async () => {
-        while (!cancelled && next < count) {
+        while (!cancelled && next < total) {
           const i = next++;
           const img = await loadFrame(i);
           if (cancelled) return;
@@ -208,7 +211,7 @@ export function ScrollSequence({ dir, count, ext, poster, alt, ref }: ScrollSequ
       engineRef.current = null;
       setFrameMode(false);
     };
-  }, [dir, count, ext, reduced]);
+  }, [segments]);
 
   const showPoster = !frameMode;
 

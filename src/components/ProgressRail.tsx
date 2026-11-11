@@ -1,53 +1,39 @@
 'use client';
 
-import { useEffect, useState } from 'react';
 import { beats } from '@/content/beats';
+import { useBeatState } from '@/lib/beat-store';
 import styles from './ProgressRail.module.css';
 
-const ids = beats.map((beat) => `beat-${beat.slug}`);
+const LAST = beats.length - 1;
 
-/** Fixed side rail of eight dots. Shows the beat in view. Hidden on mobile. */
+/**
+ * Fixed side rail of eight dots: hero, six story beats, visit.
+ * The active dot follows the shared beat state. Hidden on mobile.
+ * Clicks are routed by the scroll helper in scroll.ts.
+ */
 export function ProgressRail() {
-  const [active, setActive] = useState(0);
-
-  useEffect(() => {
-    const targets = ids
-      .map((id) => document.getElementById(id))
-      .filter((el): el is HTMLElement => el !== null);
-
-    // The band across the middle of the viewport decides the active beat.
-    const observer = new IntersectionObserver(
-      (entries) => {
-        for (const entry of entries) {
-          if (entry.isIntersecting) {
-            const index = ids.indexOf(entry.target.id);
-            if (index !== -1) setActive(index);
-          }
-        }
-      },
-      { rootMargin: '-45% 0px -45% 0px', threshold: 0 },
-    );
-
-    targets.forEach((el) => observer.observe(el));
-    return () => observer.disconnect();
-  }, []);
+  const { zone, segment } = useBeatState();
+  const active = zone === 'hero' ? 0 : zone === 'visit' ? LAST : segment + 1;
 
   return (
     <nav className={styles.rail} aria-label="Beats">
       <ol className={styles.list}>
-        {beats.map((beat, i) => (
-          <li key={beat.id}>
-            <a
-              className={styles.link}
-              href={`#beat-${beat.slug}`}
-              aria-label={`${i + 1}. ${beat.title}`}
-              aria-current={i === active ? 'step' : undefined}
-              data-active={i === active ? 'true' : 'false'}
-            >
-              <span className={styles.dot} aria-hidden="true" />
-            </a>
-          </li>
-        ))}
+        {beats.map((beat, i) => {
+          const isActive = i === active;
+          return (
+            <li key={beat.id}>
+              <a
+                className={styles.link}
+                href={`#beat-${beat.slug}`}
+                aria-label={`${i + 1}. ${beat.title}`}
+                aria-current={isActive ? 'step' : undefined}
+                data-active={isActive ? 'true' : 'false'}
+              >
+                <span className={styles.dot} aria-hidden="true" />
+              </a>
+            </li>
+          );
+        })}
       </ol>
     </nav>
   );

@@ -1,8 +1,8 @@
 import { Hero } from '@/components/Hero';
-import { BeatSection } from '@/components/BeatSection';
+import { StorySection } from '@/components/StorySection';
 import { ProgressRail } from '@/components/ProgressRail';
 import { Visit } from '@/components/Visit';
-import { beats, sequenceBeats } from '@/content/beats';
+import { beats } from '@/content/beats';
 
 export default function Home() {
   const hero = beats.find((beat) => beat.kind === 'hero');
@@ -12,9 +12,7 @@ export default function Home() {
     <>
       <main id="main">
         {hero && <Hero beat={hero} />}
-        {sequenceBeats.map((beat) => (
-          <BeatSection key={beat.id} beat={beat} />
-        ))}
+        <StorySection />
         {visit && <Visit beat={visit} />}
       </main>
       <ProgressRail />

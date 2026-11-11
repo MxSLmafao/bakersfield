@@ -1,0 +1,223 @@
+/* Soft band from the hero cream into the story stage colour. */
+.lead {
+  height: 14svh;
+  background: linear-gradient(to bottom, var(--cream), var(--stage));
+}
+
+.section {
+  position: relative;
+  height: 100vh;
+  height: 100svh;
+  width: 100%;
+  overflow: hidden;
+  background: var(--stage);
+}
+
+.anchor {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 0;
+  height: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.stage {
+  position: relative;
+  height: 100%;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: clamp(20px, 3vw, 56px);
+  padding: 0 var(--gutter);
+}
+
+/* Square frame. The mask fades the outer edge so no square edge shows. */
+.media {
+  position: relative;
+  flex: 0 0 auto;
+  width: min(86svh, 54vw);
+  aspect-ratio: 1;
+  -webkit-mask-image:
+    linear-gradient(to right, transparent, #000 6%, #000 94%, transparent),
+    linear-gradient(to bottom, transparent, #000 6%, #000 94%, transparent);
+  -webkit-mask-composite: source-in;
+  mask-image:
+    linear-gradient(to right, transparent, #000 6%, #000 94%, transparent),
+    linear-gradient(to bottom, transparent, #000 6%, #000 94%, transparent);
+  mask-composite: intersect;
+}
+
+.poster {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.copy,
+.card {
+  background: var(--cream);
+  border: var(--pixel) solid var(--ink);
+  box-shadow: var(--pixel-shadow);
+}
+
+.copy {
+  flex: 0 1 auto;
+  width: clamp(260px, 34vw, 440px);
+  min-width: 0;
+  padding: clamp(20px, 2.2vw, 32px);
+}
+
+/* Panels share one grid cell, so the card keeps the height of the tallest panel. */
+.panels {
+  display: grid;
+}
+
+.panel {
+  grid-area: 1 / 1;
+  visibility: hidden;
+  opacity: 0;
+}
+
+.panel:first-child {
+  visibility: visible;
+  opacity: 1;
+}
+
+.num {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: clamp(2rem, 1.2rem + 2vw, 3.25rem);
+  line-height: 1;
+  color: var(--accent-strong);
+}
+
+.title {
+  margin-top: 12px;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: clamp(1.875rem, 1.3rem + 2.2vw, 3.25rem);
+  line-height: 1.05;
+  color: var(--ink);
+}
+
+.body {
+  margin-top: 16px;
+  max-width: 36ch;
+  font-size: var(--text-body);
+  line-height: 1.6;
+  color: var(--ink);
+}
+
+/* Thin pixel progress bar: six cells, one per beat. */
+.bar {
+  margin-top: 24px;
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 4px;
+}
+
+.cell {
+  height: 10px;
+  background: var(--cream);
+  border: 2px solid var(--ink);
+  transition: background-color 200ms var(--ease-out);
+}
+
+.cell[data-state='past'] {
+  background: var(--honey);
+}
+
+.cell[data-state='current'] {
+  background: var(--bake);
+}
+
+/* Reduced motion: a plain list of stills and copy. */
+.list {
+  position: relative;
+  background: var(--stage);
+  padding: 56px var(--gutter) 72px;
+}
+
+.listInner {
+  list-style: none;
+  margin: 0 auto;
+  padding: 0;
+  max-width: 880px;
+  display: grid;
+  gap: 56px;
+}
+
+.item {
+  display: grid;
+  gap: 24px;
+  justify-items: center;
+}
+
+.still {
+  width: min(100%, 560px);
+  height: auto;
+  aspect-ratio: 1;
+  object-fit: contain;
+  -webkit-mask-image:
+    linear-gradient(to right, transparent, #000 6%, #000 94%, transparent),
+    linear-gradient(to bottom, transparent, #000 6%, #000 94%, transparent);
+  -webkit-mask-composite: source-in;
+  mask-image:
+    linear-gradient(to right, transparent, #000 6%, #000 94%, transparent),
+    linear-gradient(to bottom, transparent, #000 6%, #000 94%, transparent);
+  mask-composite: intersect;
+}
+
+.card {
+  width: min(100%, 560px);
+  padding: clamp(20px, 2.2vw, 32px);
+}
+
+/* Mobile: the frame sits on top, the copy below. Nothing overlaps. */
+@media (max-width: 767px) {
+  .stage {
+    flex-direction: column;
+    justify-content: center;
+    gap: 12px;
+    padding: 12px var(--gutter);
+  }
+
+  .media {
+    width: min(calc(100vw - 2 * var(--gutter)), 46svh);
+  }
+
+  .copy {
+    width: 100%;
+    max-width: 520px;
+    padding: 16px 18px;
+  }
+
+  .num {
+    font-size: 1.75rem;
+  }
+
+  .title {
+    margin-top: 8px;
+    font-size: 1.6rem;
+  }
+
+  .body {
+    margin-top: 10px;
+    font-size: 1rem;
+  }
+
+  .bar {
+    margin-top: 14px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cell {
+    transition: none;
+  }
+}
