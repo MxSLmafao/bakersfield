@@ -1,0 +1,21 @@
+/* Rises and fades in once, when first in view. Driven by data-shown. */
+.reveal {
+  opacity: 0;
+  transform: translateY(24px);
+  transition:
+    opacity 600ms var(--ease-out),
+    transform 760ms var(--ease-spring);
+}
+
+.reveal[data-shown='true'] {
+  opacity: 1;
+  transform: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .reveal,
+  .reveal[data-shown='true'] {
+    transform: none;
+    transition: opacity 240ms linear;
+  }
+}

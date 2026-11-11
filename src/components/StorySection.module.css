@@ -13,6 +13,17 @@
   background: var(--stage);
 }
 
+/* Desktop: a faint warm glow behind the copy card, so its glass has light to
+   refract. It is kept clear of the frame (the frame sits left of x = 58%),
+   so no square edge can show. */
+@media (min-width: 768px) {
+  .section {
+    background:
+      radial-gradient(22% 60% at 82% 50%, rgba(250, 212, 136, 0.6), rgba(250, 212, 136, 0) 100%),
+      var(--stage);
+  }
+}
+
 .anchor {
   position: absolute;
   top: 0;
@@ -64,18 +75,30 @@
   display: contents;
 }
 
+/* Copy card: warm glass panel. Ink-tinted layered shadow, light edge, specular top. */
 .copy,
 .card {
-  background: var(--cream);
-  border: var(--pixel) solid var(--ink);
-  box-shadow: var(--pixel-shadow);
+  position: relative;
+  background: var(--glass-warm);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--r-lg);
+  box-shadow: var(--glass-hl), var(--shadow-panel);
+  -webkit-backdrop-filter: var(--glass-blur);
+  backdrop-filter: var(--glass-blur);
+}
+
+@supports (corner-shape: superellipse(2)) {
+  .copy,
+  .card {
+    corner-shape: superellipse(2.5);
+  }
 }
 
 .copy {
   flex: 0 1 auto;
-  width: clamp(260px, 34vw, 440px);
+  width: clamp(280px, 34vw, 448px);
   min-width: 0;
-  padding: clamp(20px, 2.2vw, 32px);
+  padding: clamp(24px, 2.6vw, 40px);
 }
 
 /* Panels share one grid cell, so the card keeps the height of the tallest panel. */
@@ -94,52 +117,77 @@
   opacity: 1;
 }
 
+/* Beat number: small, tracked, crust colour. Tabular figures keep the digits still. */
 .num {
   font-family: var(--font-display);
   font-weight: 700;
-  font-size: clamp(2rem, 1.2rem + 2vw, 3.25rem);
+  font-size: var(--text-num);
   line-height: 1;
+  letter-spacing: 0.04em;
+  font-variant-numeric: tabular-nums;
   color: var(--accent-strong);
 }
 
 .title {
-  margin-top: 12px;
+  margin-top: 14px;
   font-family: var(--font-display);
   font-weight: 700;
-  font-size: clamp(1.875rem, 1.3rem + 2.2vw, 3.25rem);
+  font-size: var(--text-card-title);
   line-height: 1.05;
   color: var(--ink);
 }
 
 .body {
-  margin-top: 16px;
-  max-width: 36ch;
+  margin-top: 18px;
+  max-width: 34ch;
   font-size: var(--text-body);
-  line-height: 1.6;
+  line-height: 1.55;
+  letter-spacing: var(--track-body);
   color: var(--ink);
 }
 
-/* Thin pixel progress bar: six cells, one per beat. */
+/* Six-step progress: a thin rounded glass track, one segment per beat.
+   Past segments are filled honey. The current one fills from honey to bake. */
 .bar {
-  margin-top: 24px;
+  margin-top: 30px;
   display: grid;
   grid-template-columns: repeat(6, 1fr);
-  gap: 4px;
+  gap: 6px;
 }
 
 .cell {
-  height: 10px;
-  background: var(--cream);
-  border: 2px solid var(--ink);
-  transition: background-color 200ms var(--ease-out);
+  position: relative;
+  height: 6px;
+  overflow: hidden;
+  border-radius: var(--r-pill);
+  background: rgba(70, 34, 23, 0.12);
+  box-shadow: inset 0 1px 1px rgba(70, 34, 23, 0.1);
 }
 
-.cell[data-state='past'] {
+.cell::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  width: 0;
+  opacity: 0;
+  border-radius: inherit;
   background: var(--honey);
+  transition:
+    width 480ms var(--ease-out),
+    opacity 280ms var(--ease-out);
 }
 
-.cell[data-state='current'] {
-  background: var(--bake);
+.cell[data-state='past']::after {
+  width: 100%;
+  opacity: 1;
+}
+
+.cell[data-state='current']::after {
+  width: 100%;
+  opacity: 1;
+  background: linear-gradient(90deg, var(--honey), var(--bake));
 }
 
 /* Reduced motion: a plain list of stills and copy. */
@@ -181,7 +229,7 @@
 
 .card {
   width: min(100%, 560px);
-  padding: clamp(20px, 2.2vw, 32px);
+  padding: clamp(24px, 2.6vw, 40px);
 }
 
 /* Mobile: the frame sits on top, the copy below. Nothing overlaps. */
@@ -205,7 +253,10 @@
   .copy {
     width: 100%;
     max-width: 520px;
-    padding: 16px 18px;
+    padding: 18px 20px;
+    border-radius: var(--r);
+    -webkit-backdrop-filter: var(--glass-blur-sm);
+    backdrop-filter: var(--glass-blur-sm);
   }
 
   .num {
@@ -223,7 +274,7 @@
   }
 
   .bar {
-    margin-top: 14px;
+    margin-top: 16px;
   }
 }
 
@@ -241,7 +292,8 @@
 
   .copy {
     width: clamp(240px, 42vw, 380px);
-    padding: 14px 16px;
+    padding: 16px 18px;
+    border-radius: var(--r);
   }
 
   .num {
@@ -260,12 +312,12 @@
   }
 
   .bar {
-    margin-top: 10px;
+    margin-top: 12px;
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .cell {
+  .cell::after {
     transition: none;
   }
 }

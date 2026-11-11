@@ -90,20 +90,46 @@ export function StorySection() {
     const ctx = gsap.context(() => {
       let lastSegment = -1;
       const unregister: (() => void)[] = [];
+      // The panel that is showing now (or fading out). -1 before the first one.
+      let shownIndex = -1;
 
+      /**
+       * Crossfade between beat panels. Interruptible: every panel that is not
+       * the incoming one is either fading out (only the previous one) or
+       * hidden at once. So fast scrolling never leaves two panels fully shown
+       * or none. Desktop adds a light blur-in. Phones keep the plain rise.
+       */
       const showPanel = (next: number) => {
+        const incoming = panelRefs.current[next];
+        if (!incoming) return;
+        const outgoing = shownIndex;
+        shownIndex = next;
+
         panelRefs.current.forEach((el, i) => {
           if (!el || i === next) return;
           gsap.killTweensOf(el);
-          gsap.set(el, { autoAlpha: 0 });
+          if (i === outgoing) {
+            // Outgoing: quick fade and a rise of 8px.
+            gsap.to(el, { autoAlpha: 0, y: -8, duration: 0.18, ease: 'power1.in' });
+          } else {
+            gsap.set(el, { autoAlpha: 0, y: 0 });
+          }
         });
-        const el = panelRefs.current[next];
-        if (!el) return;
-        gsap.killTweensOf(el);
+
+        const blur = !isPhone();
+        gsap.killTweensOf(incoming);
         gsap.fromTo(
-          el,
-          { autoAlpha: 0, y: 16 },
-          { autoAlpha: 1, y: 0, duration: 0.35, ease: 'power2.out' },
+          incoming,
+          { autoAlpha: 0, y: 14, filter: blur ? 'blur(6px)' : 'none' },
+          {
+            autoAlpha: 1,
+            y: 0,
+            filter: blur ? 'blur(0px)' : 'none',
+            duration: 0.42,
+            // A spring-like settle: a small overshoot, then rest.
+            ease: 'back.out(1.2)',
+            clearProps: 'filter',
+          },
         );
       };
 

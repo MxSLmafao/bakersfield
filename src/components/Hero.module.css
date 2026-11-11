@@ -1,30 +1,46 @@
 .hero {
   position: relative;
+  isolation: isolate;
   min-height: 100vh;
   min-height: 100svh;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 72px var(--gutter) 96px;
+  padding: 72px var(--gutter) 104px;
   text-align: center;
   overflow: hidden;
 }
 
+/* Soft warm ambient glow behind the logo. Very low contrast, so the glass
+   controls have something to refract. */
+.hero::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(42% 38% at 50% 36%, rgba(250, 212, 136, 0.5), rgba(250, 212, 136, 0) 100%),
+    radial-gradient(60% 34% at 50% 100%, rgba(249, 179, 95, 0.16), rgba(249, 179, 95, 0) 100%);
+}
+
 .inner {
+  position: relative;
+  z-index: 1;
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: clamp(12px, 2vh, 24px);
-  animation: rise 900ms var(--ease-out) both;
 }
 
-/* No card: the logo's cream edge dissolves into the cream hero background. */
+/* No card: the logo's edge is masked to transparent, so it dissolves into the hero.
+   Entrance order: logo (0 ms), wordmark (80 ms), tagline (200 ms), scroll pill (360 ms).
+   All done by 800 ms. */
 .mark {
   width: clamp(160px, 28vw, 300px);
   aspect-ratio: 1;
-  background: var(--cream);
-  animation: bob 4s ease-in-out 900ms infinite;
+  animation: logoIn 640ms var(--ease-spring) both;
 }
 
 .logo {
@@ -33,63 +49,107 @@
   object-fit: contain;
   -webkit-mask-image: radial-gradient(closest-side, #000 78%, transparent 100%);
   mask-image: radial-gradient(closest-side, #000 78%, transparent 100%);
+  animation: bob 5s ease-in-out 900ms infinite;
 }
 
 .wordmark {
   font-family: var(--font-display);
   font-weight: 700;
   font-size: var(--text-display);
-  line-height: 0.95;
-  letter-spacing: 0.01em;
+  line-height: 0.92;
+  letter-spacing: -0.015em;
   color: var(--ink);
   text-shadow: 4px 4px 0 var(--honey);
+  animation: fadeUp 480ms var(--ease-out) 80ms both;
 }
 
 .tagline {
   max-width: 28ch;
-  font-size: clamp(1.125rem, 1rem + 0.5vw, 1.375rem);
+  font-size: var(--text-lead);
+  line-height: 1.5;
+  letter-spacing: var(--track-lead);
   color: var(--ink);
+  animation: fadeUp 480ms var(--ease-out) 200ms both;
 }
 
+/* Scroll hint: a small light-glass pill with a chevron. */
 .scroll {
   position: absolute;
-  bottom: calc(12px + env(safe-area-inset-bottom, 0px));
+  z-index: 1;
+  bottom: calc(14px + env(safe-area-inset-bottom, 0px));
   left: 50%;
   transform: translateX(-50%);
-  min-width: var(--touch);
   min-height: var(--touch);
-  display: flex;
-  flex-direction: column;
+  display: inline-flex;
   align-items: center;
-  justify-content: center;
-  gap: 4px;
+  gap: 10px;
+  padding: 0 18px 0 20px;
+  border-radius: var(--r-pill);
+  background: var(--glass-light);
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--glass-hl), var(--shadow-soft);
   color: var(--ink);
   text-decoration: none;
   font-weight: 700;
-  font-size: var(--text-label);
+  font-size: var(--text-small);
+  letter-spacing: 0.04em;
+  animation: fade 440ms var(--ease-out) 360ms both;
+  transition:
+    box-shadow 300ms var(--ease-out),
+    background-color 300ms var(--ease-out);
+  -webkit-backdrop-filter: var(--glass-blur-sm);
+  backdrop-filter: var(--glass-blur-sm);
+}
+
+.scroll:focus-visible {
+  outline-offset: 4px;
 }
 
 .arrow {
-  width: 12px;
-  height: 12px;
-  border-right: 4px solid var(--ink);
-  border-bottom: 4px solid var(--ink);
+  width: 8px;
+  height: 8px;
+  margin-top: -3px;
+  border-right: 2px solid var(--ink);
+  border-bottom: 2px solid var(--ink);
   transform: rotate(45deg);
-  animation: nudge 1.6s ease-in-out infinite;
+  animation: nudge 2.4s ease-in-out 1.2s infinite;
 }
 
-.scroll:active .arrow {
-  border-color: var(--crust);
+@media (hover: hover) {
+  .scroll:hover {
+    background-color: rgba(255, 255, 255, 0.72);
+    box-shadow: var(--glass-hl), var(--shadow-lift);
+  }
 }
 
-@keyframes rise {
+@keyframes logoIn {
   from {
     opacity: 0;
-    transform: translateY(24px);
+    transform: scale(0.92);
   }
   to {
     opacity: 1;
     transform: none;
+  }
+}
+
+@keyframes fadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes fade {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
   }
 }
 
@@ -99,32 +159,50 @@
     transform: translateY(0);
   }
   50% {
-    transform: translateY(-6px);
+    transform: translateY(-5px);
   }
 }
 
+/* The chevron nudges gently, down and back. */
 @keyframes nudge {
   0%,
   100% {
-    transform: translateY(0) rotate(45deg);
+    transform: translate(0, -2px) rotate(45deg);
   }
   50% {
-    transform: translateY(6px) rotate(45deg);
+    transform: translate(0, 2px) rotate(45deg);
   }
 }
 
-/* Phones: the wordmark stays on one line from 320px wide. */
+/* Phones: the wordmark stays on one line from 320px wide. The scroll pill
+   uses less blur on phones (performance). */
 @media (max-width: 767px) {
   .wordmark {
     font-size: clamp(2.25rem, 1.2rem + 7.4vw, 3.5rem);
     white-space: nowrap;
   }
+
+  .scroll {
+    -webkit-backdrop-filter: blur(10px);
+    backdrop-filter: blur(10px);
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .inner,
+  /* Fades only. No movement, no scale, no looping nudge. */
   .mark,
+  .wordmark,
+  .tagline,
+  .scroll {
+    animation: fade 300ms linear both;
+  }
+
+  .logo,
   .arrow {
     animation: none;
+  }
+
+  .scroll {
+    transition: none;
   }
 }

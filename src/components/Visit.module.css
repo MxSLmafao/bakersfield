@@ -1,109 +1,226 @@
+/* Calm warm base, close to the stage colour, with a soft ambient glow.
+   Blends from the story's stage colour without a hard step. */
 .visit {
+  position: relative;
+  isolation: isolate;
   min-height: 100vh;
   min-height: 100svh;
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 80px var(--gutter) calc(80px + env(safe-area-inset-bottom, 0px));
-  background: var(--butter);
+  padding: 88px var(--gutter) calc(32px + env(safe-area-inset-bottom, 0px));
+  background:
+    radial-gradient(56% 44% at 50% 48%, rgba(250, 212, 136, 0.55), rgba(250, 212, 136, 0) 100%),
+    linear-gradient(180deg, var(--stage) 0%, var(--warm-mid) 26%, var(--warm-mid) 100%);
   content-visibility: auto;
   contain-intrinsic-size: auto 100svh;
 }
 
+/* Warm glass card. Same material as the story copy panel. */
 .card {
   width: min(560px, 100%);
-  padding: clamp(24px, 4vw, 48px);
-  background: var(--cream);
-  border: var(--pixel) solid var(--ink);
-  box-shadow: 8px 8px 0 var(--ink);
+  padding: clamp(28px, 4vw, 52px);
+  background: var(--glass-warm);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--r-lg);
+  box-shadow: var(--glass-hl), var(--shadow-panel);
+  -webkit-backdrop-filter: var(--glass-blur);
+  backdrop-filter: var(--glass-blur);
   text-align: left;
+}
+
+@supports (corner-shape: superellipse(2)) {
+  .card {
+    corner-shape: superellipse(2.5);
+  }
 }
 
 .num {
   font-family: var(--font-display);
   font-weight: 700;
-  font-size: clamp(2rem, 1.2rem + 2vw, 3.25rem);
+  font-size: var(--text-num);
   line-height: 1;
+  letter-spacing: 0.04em;
+  font-variant-numeric: tabular-nums;
   color: var(--accent-strong);
 }
 
 .title {
-  margin-top: 12px;
+  margin-top: 14px;
   font-family: var(--font-display);
   font-weight: 700;
-  font-size: clamp(2rem, 1.3rem + 3vw, 4rem);
+  font-size: clamp(2rem, 1.3rem + 3vw, 3.75rem);
   line-height: 1.05;
   color: var(--ink);
 }
 
 .body {
-  margin-top: 16px;
-  max-width: 36ch;
+  margin-top: 18px;
+  max-width: 34ch;
+  font-size: var(--text-body);
+  line-height: 1.55;
   color: var(--ink);
 }
 
+/* The button arrives a beat after the card. */
+.actions {
+  margin-top: 32px;
+  opacity: 0;
+  transform: translateY(12px);
+  transition:
+    opacity 520ms var(--ease-out) 180ms,
+    transform 620ms var(--ease-spring) 180ms;
+}
+
+.card[data-shown='true'] .actions {
+  opacity: 1;
+  transform: none;
+}
+
+/* Primary control: dark warm glass pill. */
 .button {
-  margin-top: 28px;
-  min-height: var(--touch);
-  -webkit-tap-highlight-color: transparent;
-  touch-action: manipulation;
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  min-height: 52px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  padding: 12px 28px;
-  background: var(--honey);
-  color: var(--ink);
-  border: var(--pixel) solid var(--ink);
-  box-shadow: var(--pixel-shadow);
+  padding: 14px 32px;
+  border-radius: var(--r-pill);
+  background: var(--glass-ink);
+  color: var(--cream);
+  border: 1px solid var(--glass-border-ink);
+  box-shadow: var(--glass-hl-ink), var(--shadow-lift);
+  -webkit-backdrop-filter: var(--glass-blur);
+  backdrop-filter: var(--glass-blur);
   font-family: var(--font-body);
   font-weight: 700;
   font-size: var(--text-label);
+  letter-spacing: 0.01em;
   text-decoration: none;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
   transition:
-    transform 120ms var(--ease-out),
-    box-shadow 120ms var(--ease-out),
-    background-color 120ms var(--ease-out);
+    transform 460ms var(--ease-spring),
+    box-shadow 360ms var(--ease-out),
+    background-color 240ms var(--ease-out);
 }
 
-.button:active {
-  transform: translate(4px, 4px);
-  box-shadow: 0 0 0 var(--ink);
-  background: var(--amber);
+/* Static specular gloss across the top half of the glass. */
+.button::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border-radius: inherit;
+  pointer-events: none;
+  background: linear-gradient(180deg, rgba(255, 240, 220, 0.14), rgba(255, 240, 220, 0) 55%);
 }
 
-/* The lift is a bonus on mouse screens only. Touch has no hover state. */
+/* Moving sheen. Parked off to the left until hover. */
+.button::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border-radius: inherit;
+  pointer-events: none;
+  background: linear-gradient(
+    105deg,
+    rgba(255, 240, 220, 0) 36%,
+    rgba(255, 240, 220, 0.34) 50%,
+    rgba(255, 240, 220, 0) 64%
+  );
+  transform: translateX(-120%);
+}
+
+/* Hover is a mouse-only effect. Touch has no hover state. */
 @media (hover: hover) {
   .button:hover {
-    transform: translate(0, -2px);
-    box-shadow: 4px 6px 0 var(--ink);
-    background: var(--amber);
+    transform: translateY(-1px);
+    background-color: rgba(70, 34, 23, 0.86);
+    box-shadow:
+      var(--glass-hl-ink),
+      0 3px 8px rgba(70, 34, 23, 0.24),
+      0 24px 42px -14px rgba(70, 34, 23, 0.55);
   }
+
+  .button:hover::after {
+    transform: translateX(120%);
+    transition: transform 380ms var(--ease-out);
+  }
+}
+
+/* Press: a quick squeeze. Release uses the spring from the base rule. */
+.button:active {
+  transform: scale(0.97);
+  transition-duration: 100ms;
 }
 
 .button:focus-visible {
-  outline: 3px solid var(--ink);
-  outline-offset: 4px;
+  outline: 2px solid var(--bake);
+  outline-offset: 3px;
 }
 
-/* Phones: full-width button, roomier card. */
+.foot {
+  margin-top: 56px;
+  font-size: var(--text-small);
+  letter-spacing: var(--track-small);
+  color: var(--ink);
+  text-align: center;
+}
+
+/* Phones: full-width button, roomier card, lighter blur. */
 @media (max-width: 767px) {
   .visit {
-    padding: 56px var(--gutter) calc(56px + env(safe-area-inset-bottom, 0px));
+    padding: 72px var(--gutter) calc(24px + env(safe-area-inset-bottom, 0px));
   }
 
   .card {
-    padding: 24px 20px;
-    box-shadow: 6px 6px 0 var(--ink);
+    padding: 26px 22px;
+    border-radius: var(--r);
+    -webkit-backdrop-filter: var(--glass-blur-sm);
+    backdrop-filter: var(--glass-blur-sm);
+  }
+
+  .actions {
+    width: 100%;
   }
 
   .button {
     width: 100%;
-    min-height: 48px;
+    min-height: 52px;
+  }
+
+  /* No moving sheen on phones. */
+  .button::after {
+    display: none;
+  }
+
+  .foot {
+    margin-top: 40px;
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .button {
-    transition: none;
+  .actions {
+    transform: none;
+    transition: opacity 240ms linear;
+  }
+
+  .button,
+  .button:active {
+    transform: none;
+    transition: background-color 200ms linear, box-shadow 200ms linear;
+  }
+
+  .button:hover {
+    transform: none;
+  }
+
+  .button::after {
+    display: none;
   }
 }

@@ -8,9 +8,7 @@ import { SmoothScroll } from '@/components/SmoothScroll';
 export const metadata: Metadata = {
   title: 'Bakersfield',
   description: 'Bakersfield is a bakery. Follow the croissant from flour to oven.',
-  icons: {
-    icon: '/brand/logo-mark.jpg',
-  },
+  // Favicon and Apple icon come from src/app/icon.png and src/app/apple-icon.png.
   appleWebApp: {
     title: 'Bakersfield',
     statusBarStyle: 'default',

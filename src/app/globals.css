@@ -12,32 +12,70 @@
   --bake: #d06c2e;
   --crust: #a8572d;
   --ink: #462217;
+  /* Between stage and cream. The calm base of the Visit section. */
+  --warm-mid: #f7e6c2;
 
   --bg: var(--cream);
   --fg: var(--ink);
   --surface: var(--butter);
   --accent: var(--bake);
   --accent-strong: var(--crust);
-  --focus: var(--crust);
+  --focus: var(--bake);
 
   --font-display: 'Pixelify Sans', ui-monospace, monospace;
   --font-body: 'DM Sans Variable', system-ui, -apple-system, 'Segoe UI', sans-serif;
 
-  /* Fluid type scale */
+  /* Type scale. Display sizes are fluid; body steps are fixed to the same ratio. */
+  --text-small: clamp(0.875rem, 0.85rem + 0.12vw, 0.9375rem);
   --text-body: clamp(1rem, 0.95rem + 0.25vw, 1.125rem);
+  --text-lead: clamp(1.125rem, 1rem + 0.5vw, 1.375rem);
   --text-label: clamp(1rem, 0.96rem + 0.2vw, 1.0625rem);
+  --text-card-title: clamp(1.875rem, 1.3rem + 2.2vw, 3.25rem);
   --text-title: clamp(2.25rem, 1.2rem + 4.5vw, 5.5rem);
   --text-display: clamp(3.5rem, 1.5rem + 9vw, 11rem);
-  --text-num: clamp(2.5rem, 1rem + 5vw, 6rem);
+  --text-num: clamp(2rem, 1.2rem + 2vw, 3.25rem);
 
-  /* Pixel frame */
-  --pixel: 4px;
-  --pixel-shadow: 4px 4px 0 var(--ink);
+  /* Tracking: tight on large sizes, open on small ones. */
+  --track-display: -0.01em;
+  --track-lead: -0.005em;
+  --track-body: 0;
+  --track-small: 0.01em;
+
+  /* Glass materials. Warm-tinted, from the palette. */
+  --glass-warm: rgba(255, 248, 232, 0.55);
+  --glass-light: rgba(255, 255, 255, 0.6);
+  --glass-ink: rgba(70, 34, 23, 0.9);
+  --glass-border: rgba(255, 255, 255, 0.7);
+  --glass-border-ink: rgba(255, 240, 220, 0.26);
+  --glass-hl: inset 0 1px 0 rgba(255, 255, 255, 0.85);
+  --glass-hl-ink: inset 0 1px 0 rgba(255, 232, 200, 0.28), inset 0 -1px 0 rgba(0, 0, 0, 0.16);
+  --glass-blur: saturate(180%) blur(18px);
+  --glass-blur-sm: saturate(170%) blur(12px);
+
+  /* Opaque stand-ins for browsers without backdrop-filter. */
+  --glass-warm-solid: #fbf1de;
+  --glass-light-solid: #fffaf0;
+  --glass-ink-solid: #4a2a1e;
+
+  /* Soft depth. Shadows are tinted with ink, never grey. */
+  --shadow-soft: 0 1px 2px rgba(70, 34, 23, 0.06), 0 8px 22px -12px rgba(70, 34, 23, 0.22);
+  --shadow-lift: 0 2px 4px rgba(70, 34, 23, 0.08), 0 16px 34px -14px rgba(70, 34, 23, 0.4);
+  --shadow-panel:
+    0 1px 1px rgba(70, 34, 23, 0.05), 0 10px 28px -14px rgba(70, 34, 23, 0.26),
+    0 36px 70px -40px rgba(70, 34, 23, 0.3);
+
+  /* Radius */
+  --r-sm: 10px;
+  --r: 16px;
+  --r-lg: 24px;
+  --r-pill: 999px;
+
+  /* Motion */
+  --ease-out: cubic-bezier(0.4, 0, 0.2, 1);
+  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
 
   --gutter: 16px;
   --touch: 44px;
-  --radius: 0;
-  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 *,
@@ -72,8 +110,11 @@ body {
   font-size: var(--text-body);
   line-height: 1.6;
   -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
   overflow-x: hidden;
   overflow-x: clip;
+  /* Pixelify Sans draws its "fi" ligature like an "A". Keep letters separate. */
+  font-variant-ligatures: no-common-ligatures;
 }
 
 img,
@@ -100,8 +141,28 @@ p {
   margin: 0;
 }
 
+h1,
+h2,
+h3 {
+  text-wrap: balance;
+}
+
+p {
+  text-wrap: pretty;
+}
+
+/* Sections and beat anchors stop a little below the top when jumped to. */
+[id] {
+  scroll-margin-top: var(--gutter);
+}
+
+::selection {
+  background: var(--honey);
+  color: var(--ink);
+}
+
 :focus-visible {
-  outline: 3px solid var(--focus);
+  outline: 2px solid var(--focus);
   outline-offset: 3px;
 }
 
@@ -110,16 +171,25 @@ p {
   top: var(--gutter);
   left: var(--gutter);
   z-index: 100;
-  min-height: var(--touch);
+  min-height: 48px;
   display: inline-flex;
   align-items: center;
-  padding: 0 20px;
-  background: var(--butter);
-  color: var(--ink);
-  border: var(--pixel) solid var(--ink);
-  box-shadow: var(--pixel-shadow);
+  padding: 0 22px;
+  border-radius: var(--r-pill);
+  background: var(--glass-ink);
+  color: var(--cream);
+  border: 1px solid var(--glass-border-ink);
+  box-shadow: var(--glass-hl-ink), var(--shadow-lift);
   font-weight: 700;
   transform: translateY(-200%);
+  transition: transform 300ms var(--ease-out);
+}
+
+@supports (backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px)) {
+  .skip-link {
+    -webkit-backdrop-filter: var(--glass-blur-sm);
+    backdrop-filter: var(--glass-blur-sm);
+  }
 }
 
 .skip-link:focus {
@@ -138,13 +208,17 @@ p {
   border: 0;
 }
 
+/* Browsers without backdrop-filter: solid warm surfaces instead of glass. */
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  :root {
+    --glass-warm: var(--glass-warm-solid);
+    --glass-light: var(--glass-light-solid);
+    --glass-ink: var(--glass-ink-solid);
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   html {
     scroll-behavior: auto;
   }
-}
-
-/* Pixelify Sans draws its "fi" ligature like an "A". Keep letters separate. */
-:root {
-  font-variant-ligatures: no-common-ligatures;
 }

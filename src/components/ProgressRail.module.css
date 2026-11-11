@@ -1,53 +1,68 @@
 .rail {
   position: fixed;
-  right: 8px;
+  right: 12px;
   top: 50%;
   z-index: 50;
   transform: translateY(-50%);
   display: none;
 }
 
+/* Slim light-glass capsule. */
 .list {
   list-style: none;
   margin: 0;
-  padding: 8px 4px;
+  padding: 6px 0;
   display: flex;
   flex-direction: column;
   align-items: center;
-  background: var(--cream);
-  border: 3px solid var(--ink);
-  box-shadow: 4px 4px 0 var(--ink);
+  border-radius: var(--r-pill);
+  background: var(--glass-light);
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--glass-hl), var(--shadow-soft);
+  -webkit-backdrop-filter: var(--glass-blur-sm);
+  backdrop-filter: var(--glass-blur-sm);
 }
 
+/* The link is the 44px hit target. The dot inside is only the visible part. */
 .link {
+  position: relative;
   width: var(--touch);
   height: var(--touch);
   display: flex;
   align-items: center;
   justify-content: center;
+  border-radius: var(--r-pill);
   text-decoration: none;
 }
 
 .dot {
-  width: 14px;
-  height: 14px;
-  background: var(--honey);
-  border: 3px solid var(--ink);
-  transition: background-color 160ms var(--ease-out), transform 160ms var(--ease-out);
+  display: block;
+  width: 9px;
+  height: 9px;
+  border-radius: var(--r-pill);
+  background: rgba(70, 34, 23, 0.3);
+  transition:
+    height 460ms var(--ease-spring),
+    background-color 240ms var(--ease-out);
 }
 
+/* The active dot grows into an ink pill. */
 .link[data-active='true'] .dot {
-  background: var(--bake);
-  transform: scale(1.3);
+  height: 22px;
+  background: var(--ink);
 }
 
 .link:hover .dot {
-  background: var(--amber);
+  background: var(--crust);
+}
+
+.link[data-active='true']:hover .dot {
+  background: var(--ink);
 }
 
 .link:focus-visible {
-  outline: 3px solid var(--ink);
-  outline-offset: -3px;
+  outline: 2px solid var(--bake);
+  outline-offset: -4px;
 }
 
 @media (min-width: 768px) {
